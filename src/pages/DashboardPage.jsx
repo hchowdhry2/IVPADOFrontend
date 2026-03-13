@@ -2,10 +2,14 @@ import React, { useState } from 'react'
 import HighChartsBarChart, { sections } from '../components/burnupChart/HighChartsBarChart';
 import { useSpillageContext } from '../context/SpillageProvider';
 import UserStoryCard from '../components/UserStoryCard';
+import { useDevOpsContext } from '../context/DevOpsProvider';
+import Selector from '../components/Selector';
+import { Select } from '@mui/material';
 
 const DashboardPage = () => {
 
     const {data, setProject, nSprints, setNSprints, timeFrame, setTimeFrame, filterType, setFilterType} = useSpillageContext();
+    const {projects, selectedProject, setSelectedProject, teams, selectedTeam, setSelectedTeam, areaPaths, selectedAreaPath, setSelectedAreaPath} = useDevOpsContext();
 
         // 1. Initialize state with the 'key' of the first section ('all')
     const [activeSection, setActiveSection] = useState('all');
@@ -19,16 +23,24 @@ const DashboardPage = () => {
 
       <div className="filter-row">
         {/* Project Selection */}
-        <div className="filter-group">
-          <h3>Select Project:</h3>
-          <select 
-            className="select-dropdown" 
-            onChange={e => setProject(e.target.value)}
-          >
-            <option value='IVP-SRM'>SRM</option>
-            <option value="IVP-EDM">EDM</option>
-          </select>
-        </div>
+        <Selector
+          options={projects}
+          setValue={setSelectedProject}
+          title="Select Project:"
+        />
+
+        {selectedProject ? <Selector
+          options={teams}
+          setValue={setSelectedTeam}
+          title="Select Team:"
+        /> : null}
+
+        {selectedTeam ?
+          <Selector
+            options={areaPaths}
+            setValue={setSelectedAreaPath}
+            title="Select Area Path:"
+          /> : null}
 
         {/* Timeframe and Sprint Controls */}
         <div className="controls-container">

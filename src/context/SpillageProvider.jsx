@@ -16,7 +16,9 @@ const SpillageProvider = ({ children }) => {
     const params = new URLSearchParams();
 
     useEffect(() => {
-        fetchData();
+        if( nSprints >= 1) {
+            fetchData();
+        }
     }, [project,nSprints,timeFrame]);
 
     const fetchData = async () => {
@@ -30,9 +32,6 @@ const SpillageProvider = ({ children }) => {
           }
           const res = await fetchTimeFrames.getAllSprintData({project, params});
           
-          console.log('SpillageProvider: Full API Response', res);
-          
-          // Save the entire object: { All: {...}, Feature: {...}, Client: {...} }
           setData(res); 
           setError(null);
       } catch (error) {

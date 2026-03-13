@@ -1,0 +1,52 @@
+/* Navbar.css */
+
+.navbar {
+    padding: 10px 20px; /* Padding around the navbar */
+    position: fixed;
+    top: 0px;
+    background-color: white; /* Background color */
+}
+
+.navbar-container {
+    display: flex; /* Flexbox for layout */
+    align-items: center; /* Center items vertically */
+    justify-content: space-between; /* Space between logo and menu */
+}
+
+.navbar-logo {
+    font-size: 24px; /* Logo font size */
+    font-weight: bold; /* Bold logo */
+}
+
+.menu-toggle {
+    background: none; /* No background for the button */
+    border: none; /* No border */
+    font-size: 24px; /* Font size for the button */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.nav-menu {
+    list-style: none; /* Remove default list styles */
+    display: flex; /* Flexbox for horizontal layout */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}
+
+.nav-menu.active {
+    display: block; /* Show menu when active */
+}
+
+.nav-link {
+    color: black;
+    padding: 10px 15px; /* Padding for links */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.nav-link:hover {
+    color: #555; /* Darker background on hover */
+}
+
+.nav-link.active {
+    color: #007bff; /* Highlight active link */
+}

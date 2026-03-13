@@ -1,16 +1,18 @@
 
 import './App.css'
-import HighChartsBarChart from './components/burnupChart/HighChartsBarChart'
+import Navbar from './components/burnupChart/Navbar'
+import DevOpsProvider from './context/DevOpsProvider'
 import SpillageProvider from './context/SpillageProvider'
-import DashboardPage from './pages/DashboardPage'
+import AppRoutes from './routes/AppRoutes'
 
 function App() {
   return (
     <>
       <SpillageProvider>
-        <h1>ADO Dashboard Performance</h1>
-        {/* <HighChartsBarChart /> */}
-        <DashboardPage />
+        <DevOpsProvider>
+          <Navbar/>
+          <AppRoutes />
+        </DevOpsProvider>
       </SpillageProvider>
     </>
   )
