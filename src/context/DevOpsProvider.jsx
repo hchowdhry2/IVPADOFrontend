@@ -6,12 +6,16 @@ export const DevOpsContext = createContext();
 
 const DevOpsProvider = ({ children }) => {
 
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
     const [teams, setTeams] = useState([]);
     const [selectedTeam, setSelectedTeam] = useState(null);
-    const [areaPaths, setAreaPaths] = useState([]);
-    const [selectedAreaPath, setSelectedAreaPath] = useState(null);
+    const [lastN, setLastN] = useState(6);
+    const [timeFrame, setTimeFrame] = useState(null);
+    const [data, setData] = useState(null);
 
     useEffect(() => {
         fetchProjects();
@@ -25,10 +29,10 @@ const DevOpsProvider = ({ children }) => {
 
     useEffect(() => {
         if(selectedProject && selectedTeam) {
-            console.log(selectedTeam);
-            fetchAreaPaths({selectedProject, selectedTeam});
+            fetchData();
         }
-    }, [selectedTeam]);
+    }, [selectedProject, selectedTeam, timeFrame, lastN]);
+
 
     const fetchProjects = async () => {
         try {
@@ -48,23 +52,39 @@ const DevOpsProvider = ({ children }) => {
         }
     }
 
-    const fetchAreaPaths = async ({selectedProject, selectedTeam}) => {
+    const fetchData = async () => {
+        setLoading(true); 
         try {
-            const areaPaths = await fetchAdo.getAreaPaths({projectId: selectedProject, teamId:  selectedTeam});
-            setAreaPaths(areaPaths);
-            console.log('Fetched area paths:', areaPaths);
+            const res = await fetchAdo.getSpillageData({projectId: selectedProject, teamId: selectedTeam, timeframe: timeFrame, lastN: lastN});
+            console.log('Fetched spillage data:', res);
+            setData(res); 
+            setError(null);
         } catch (error) {
-            console.error('Error fetching area paths:', error);
+            console.error("Fetch Error:", error);
+            setError(error.message);
+        } finally {
+            setLoading(false);
         }
+    }
+
+    const fetchIterationsStats = async ({selectedProject, selectedTeam, selectedAreaPath}) => {
+        try {
+            const stats = await fetchAdo.getIterationStats({projectId: selectedProject, teamId:  selectedTeam, areaPath: selectedAreaPath, lastN: lastN});
+            console.log('Fetched iteration stats:', stats);
+        } catch (error) {
+            console.error('Error fetching iteration stats:', error);
+            return null;
+        }   
     }
   return (
     <DevOpsContext.Provider value={{
+        data,
         projects,
         selectedProject, setSelectedProject,
         teams,
         selectedTeam, setSelectedTeam,
-        areaPaths,
-        selectedAreaPath, setSelectedAreaPath
+        lastN, setLastN,
+        timeFrame, setTimeFrame,
         }}>
       {children}
     </DevOpsContext.Provider>

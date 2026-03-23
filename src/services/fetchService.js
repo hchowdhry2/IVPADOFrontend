@@ -20,13 +20,34 @@ export const fetchAdo = {
             return [];
         }
     },
-    getAreaPaths : async ({projectId, teamId}) => {
+    getIterationStats : async ({projectId, teamId, areaPath, lastNSprints}) => {
         try {
-            const response = await apiConfigDevops.get(`/devops-area-paths/${projectId}/${teamId}`);
-            return response.data.values; // Return the list of area paths
+            // Encode the areaPath to handle spaces and special characters safely
+            const safeAreaPath = encodeURIComponent(areaPath); 
+            const response = await apiConfigDevops.get(
+                `/devops-iteration-stats/${projectId}/${teamId}/${safeAreaPath}?lastNSprints=${lastNSprints}`
+            );
+            return response.data;
         } catch (error) {
-            console.error('Error fetching area paths:', error);
-            return [];
+            console.error('Error fetching iteration stats:', error);
+            return null;
+        }
+    },
+    getSpillageData : async ({projectId, teamId, timeframe, lastN}) => {
+        try {
+            if (timeframe) {
+                const response = await apiConfig.get(
+                `?projectId=${projectId}&teamId=${teamId}&timeframe=${timeframe}&n=${lastN}`
+                );
+                return response.data;
+            }
+            const response = await apiConfig.get(
+                `?projectId=${projectId}&teamId=${teamId}&n=${lastN}`
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching spillage data:', error);
+            return null;
         }
     }
 }
