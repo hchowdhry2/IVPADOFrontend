@@ -8,14 +8,16 @@ import { Select } from '@mui/material';
 
 const DashboardPage = () => {
 
-    const {data, setProject, nSprints, setNSprints, timeFrame, setTimeFrame, filterType, setFilterType} = useSpillageContext();
-    const {projects, selectedProject, setSelectedProject, teams, selectedTeam, setSelectedTeam, areaPaths, selectedAreaPath, setSelectedAreaPath} = useDevOpsContext();
+    // const {data, setProject, nSprints, setNSprints, timeFrame, setTimeFrame, filterType, setFilterType} = useSpillageContext();
+    const {data, projects, selectedProject, setSelectedProject, teams, selectedTeam, setSelectedTeam, lastN, setLastN, timeFrame, setTimeFrame} = useDevOpsContext();
 
         // 1. Initialize state with the 'key' of the first section ('all')
     const [activeSection, setActiveSection] = useState('all');
 
     // 2. Find the configuration for the currently selected section
     const currentSection = sections.find(s => s.key === activeSection);
+
+    console.log(data);
 
   return (
     <div className="dashboard-container">
@@ -35,13 +37,6 @@ const DashboardPage = () => {
           title="Select Team:"
         /> : null}
 
-        {selectedTeam ?
-          <Selector
-            options={areaPaths}
-            setValue={setSelectedAreaPath}
-            title="Select Area Path:"
-          /> : null}
-
         {/* Timeframe and Sprint Controls */}
         <div className="controls-container">
           <div className="filter-group">
@@ -49,8 +44,8 @@ const DashboardPage = () => {
             <input 
               type="number" 
               className="sprint-input"
-              value={nSprints} 
-              onChange={(e) => setNSprints(e.target.value)}
+              value={lastN} 
+              onChange={(e) => setLastN(e.target.value)}
             />
           </div>
 

@@ -15,11 +15,11 @@ const SpillageProvider = ({ children }) => {
 
     const params = new URLSearchParams();
 
-    useEffect(() => {
-        if( nSprints >= 1) {
-            fetchData();
-        }
-    }, [project,nSprints,timeFrame]);
+    // useEffect(() => {
+    //     if( nSprints >= 1) {
+    //         fetchData();
+    //     }
+    // }, [project,nSprints,timeFrame]);
 
     const fetchData = async () => {
       setLoading(true); 

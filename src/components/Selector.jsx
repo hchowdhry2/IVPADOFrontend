@@ -14,7 +14,7 @@ const Selector = ({ options, setValue, title}) => {
             onChange={e => setValue(e.target.value)}
           >
             {options.map((option,idx) => (
-              <option key={option.id || idx} value={option.id || option.value}>
+              <option key={option.id || idx} value={option.value}>
                 {option.name || option.value}
               </option>
             ))}
