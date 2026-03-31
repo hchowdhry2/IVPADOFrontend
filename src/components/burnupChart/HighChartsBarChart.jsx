@@ -122,7 +122,7 @@ export const sections = [
     },
     { 
       key: 'client', 
-      title: 'Client', 
+      title: 'Client Issues', 
       barColor: '#ff8042' 
     }
   ];
@@ -139,7 +139,7 @@ const HighChartsBarChart = ({ data }) => {
       {/* Individual Bar Charts (Keeping your existing loop) */}
       {/* Single Combined Line Chart */}
       <RenderLineChart 
-        title="Overall Spillage Trends" 
+        title="Spillage" 
         data={data} 
         sections={sections} 
       />
@@ -148,7 +148,7 @@ const HighChartsBarChart = ({ data }) => {
       {sections.map((section) => (
         <div key={section.key} className="section-container">
           <RenderChart 
-            title={`${section.title} Stats`} 
+            title={`${section.title}`} 
             statsArray={data[section.key]?.stats || []} 
             barColor={section.barColor} 
           />
