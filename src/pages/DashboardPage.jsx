@@ -70,10 +70,10 @@ const DashboardPage = () => {
       {data ? (
         <div className="chart-container">
           <HighChartsBarChart data={data} />
-          <div className="filter-header">
+          {/* <div className="filter-header">
             <h3>View Category:</h3>
             
-            {/* 3. The Filter Dropdown */}
+            
             <div className="tab-container">
             {sections.map(section => (
                 <button
@@ -85,12 +85,12 @@ const DashboardPage = () => {
                 </button>
             ))}
             </div>
-        </div>
+        </div> */}
 
-        <hr className="divider" />
+        {/* <hr className="divider" /> */}
 
         {/* 4. Conditional Rendering */}
-        {data && currentSection && (
+        {/* {data && currentSection && (
             <div className="active-view-container">
             <h2 style={{ color: currentSection.barColor }}>
                 {currentSection.title} Stories
@@ -100,7 +100,7 @@ const DashboardPage = () => {
                 stories={data[currentSection.key]?.history || []} 
             />
             </div>
-        )}
+        )} */}
             </div>
         ) : null}
     </div>

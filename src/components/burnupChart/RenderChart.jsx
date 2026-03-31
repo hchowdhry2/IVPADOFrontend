@@ -55,10 +55,10 @@ const RenderChart = ({ title, statsArray, barColor }) => {
     },
     series: [
       { 
-        name: 'Initial Assigned', 
+        name: 'Planned', 
         data: initialAssignedData, 
         stack: 'assignedGroup', 
-        color: barColor 
+        color: '#8884d8'
       },
       { 
         name: 'Mid-Sprint Added', 
@@ -67,16 +67,16 @@ const RenderChart = ({ title, statsArray, barColor }) => {
         color: '#9bccfeff' 
       },
       { 
-        name: 'Completed (Timely)', 
+        name: 'Completed within sprint', 
         data: completedTimelyData, 
         stack: 'completedGroup', 
-        color: '#82ca9d' // Standard Green
+        color: '#82ca9d' 
       },
       { 
-        name: 'Completed (Late)', 
+        name: 'Completed post sprint', 
         data: completedLateData, 
         stack: 'completedGroup', 
-        color: '#ffc658' // Amber/Yellow to show it was late
+        color: '#2e7d32' 
       }
     ],
     tooltip: {
