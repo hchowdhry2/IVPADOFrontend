@@ -17,31 +17,39 @@ const RenderChart = ({ title, statsArray, barColor }) => {
     item.iterationPath?.split('\\').pop() || item.name || 'Sprint'
   );
 
-  // 1. Calculate the 'Initial' portion (Total minus Mid-Sprint)
-  const initialAssignedData = statsArray.map(item => {
-    const total = getNumericValue(item, ['totalPointsAssigned', 'assignedPoints', 'assigned']);
-    const mid = getNumericValue(item, ['midSprintAddedPoints', 'midSprint']);
-    return total - mid; // The base of the stack
-  });
+  // 1. Initial Portion (Matches your backend 'InitialPoints')
+  const initialAssignedData = statsArray.map(item => 
+    getNumericValue(item, ['initialPoints', 'initial'])
+  );
 
-  // 2. Extract the Mid-Sprint portion
+  // 2. Mid-Sprint Portion (Matches your backend 'MidSprintAddedPoints')
   const midSprintData = statsArray.map(item => 
     getNumericValue(item, ['midSprintAddedPoints', 'midSprint'])
   );
 
-  // 3. Extract Completed Points
-  const completedData = statsArray.map(item =>
-    getNumericValue(item, ['totalPointsCompleted', 'completedPoints', 'completed'])
+  // 3. NEW: Timely Completed (Matches backend 'ClosedTimely')
+  const completedTimelyData = statsArray.map(item =>
+    getNumericValue(item, ['closedTimely', 'completedTimely'])
+  );
+
+  // 4. NEW: Late Completed (Matches backend 'ClosedLate')
+  const completedLateData = statsArray.map(item =>
+    getNumericValue(item, ['closedLate', 'completedLate'])
   );
 
   const options = {
     chart: { type: 'column' },
     title: { text: title },
     xAxis: { categories: sprintNames },
-    yAxis: { title: { text: 'Story Points' }, stackLabels: { enabled: true } },
+    yAxis: { 
+      title: { text: 'Story Points' }, 
+      stackLabels: { 
+        enabled: true,
+      } 
+    },
     plotOptions: {
       column: {
-        stacking: 'normal', // This enables the stacking behavior
+        stacking: 'normal', 
         dataLabels: { enabled: false }
       }
     },
@@ -49,25 +57,32 @@ const RenderChart = ({ title, statsArray, barColor }) => {
       { 
         name: 'Initial Assigned', 
         data: initialAssignedData, 
-        stack: 'assignedGroup', // Groups 'Initial' and 'Mid' into one bar
+        stack: 'assignedGroup', 
         color: barColor 
       },
       { 
         name: 'Mid-Sprint Added', 
         data: midSprintData, 
-        stack: 'assignedGroup', // Same stack name as above
-        color: '#9bccfeff' // Different color to distinguish it
+        stack: 'assignedGroup', 
+        color: '#9bccfeff' 
       },
       { 
-        name: 'Completed Points', 
-        data: completedData, 
-        stack: 'completedGroup', // Different stack name makes it a separate bar
-        color: '#82ca9d' 
+        name: 'Completed (Timely)', 
+        data: completedTimelyData, 
+        stack: 'completedGroup', 
+        color: '#82ca9d' // Standard Green
+      },
+      { 
+        name: 'Completed (Late)', 
+        data: completedLateData, 
+        stack: 'completedGroup', 
+        color: '#ffc658' // Amber/Yellow to show it was late
       }
     ],
     tooltip: {
       shared: true,
-      headerFormat: '<b>{point.x}</b><br/>'
+      headerFormat: '<b>{point.x}</b><br/>',
+      pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> <br/>'
     },
     credits: { enabled: false }
   };

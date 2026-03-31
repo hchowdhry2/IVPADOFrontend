@@ -127,29 +127,30 @@ export const sections = [
     }
   ];
 
-const HighChartsBarChart = ({data}) => {
-  const { loading } = useSpillageContext()
+const HighChartsBarChart = ({ data }) => {
+  const { loading } = useSpillageContext();
 
-  // Guard clause for loading or empty data
   if (loading || !data) {
-    return <div style={{ textAlign: 'center', padding: '50px' }}>Loading Dashboard Data...</div>
+    return <div style={{ textAlign: 'center', padding: '50px' }}>Loading Dashboard Data...</div>;
   }
-
-  
 
   return (
     <div className="dashboard-wrapper">
+      {/* Individual Bar Charts (Keeping your existing loop) */}
+      {/* Single Combined Line Chart */}
+      <RenderLineChart 
+        title="Overall Spillage Trends" 
+        data={data} 
+        sections={sections} 
+      />
+
+
       {sections.map((section) => (
         <div key={section.key} className="section-container">
           <RenderChart 
             title={`${section.title} Stats`} 
             statsArray={data[section.key]?.stats || []} 
             barColor={section.barColor} 
-          />
-          <RenderLineChart 
-            title={`${section.title} Spillage Trend`} 
-            spillageArray={data[section.key]?.spillage || []} 
-            lineColor="#ff4d4d" 
           />
         </div>
       ))}
