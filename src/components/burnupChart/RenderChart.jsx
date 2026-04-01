@@ -17,75 +17,81 @@ const RenderChart = ({ title, statsArray, barColor }) => {
     item.iterationPath?.split('\\').pop() || item.name || 'Sprint'
   );
 
-  // 1. Initial Portion (Matches your backend 'InitialPoints')
-  const initialAssignedData = statsArray.map(item => 
-    getNumericValue(item, ['initialPoints', 'initial'])
-  );
+  const initialAssignedData = statsArray.map(item => getNumericValue(item, ['initialPoints', 'initial']));
+  const midSprintData = statsArray.map(item => getNumericValue(item, ['midSprintAddedPoints', 'midSprint']));
+  const completedTimelyData = statsArray.map(item => getNumericValue(item, ['closedTimely', 'completedTimely']));
+  const completedLateData = statsArray.map(item => getNumericValue(item, ['closedLate', 'completedLate']));
 
-  // 2. Mid-Sprint Portion (Matches your backend 'MidSprintAddedPoints')
-  const midSprintData = statsArray.map(item => 
-    getNumericValue(item, ['midSprintAddedPoints', 'midSprint'])
-  );
+  // --- VELOCITY CALCULATIONS ---
+  const totalCompletedData = statsArray.map(item => getNumericValue(item, ['totalPointsCompleted', 'completed']));
+  
+  // Calculate average, defaulting to 0 if no data
+  const averageVelocityValue = totalCompletedData.length > 0 
+    ? Number((totalCompletedData.reduce((a, b) => a + b, 0) / totalCompletedData.length).toFixed(0))
+    : 0;
 
-  // 3. NEW: Timely Completed (Matches backend 'ClosedTimely')
-  const completedTimelyData = statsArray.map(item =>
-    getNumericValue(item, ['closedTimely', 'completedTimely'])
-  );
+  // Create the line data array
+  const averageVelocitySeries = new Array(sprintNames.length).fill(averageVelocityValue);
 
-  // 4. NEW: Late Completed (Matches backend 'ClosedLate')
-  const completedLateData = statsArray.map(item =>
-    getNumericValue(item, ['closedLate', 'completedLate'])
-  );
-
-  const options = {
-    chart: { type: 'column' },
-    title: { text: title },
-    xAxis: { categories: sprintNames },
-    yAxis: { 
-      title: { text: 'Story Points' }, 
-      stackLabels: { 
-        enabled: true,
-      } 
-    },
-    plotOptions: {
-      column: {
-        stacking: 'normal', 
-        dataLabels: { enabled: false }
+const options = {
+  chart: { 
+    type: 'column',
+    // Adding spacing ensure the label on the right isn't cut off
+    spacingRight: 20 
+  },
+  title: { text: title },
+  xAxis: { categories: sprintNames },
+  yAxis: { 
+    title: { text: 'Story Points' }, 
+    stackLabels: { enabled: true },
+    // 1. USE PLOTLINES FOR THE EDGE-TO-EDGE VISUAL
+    plotLines: averageVelocityValue > 0 ? [{
+      color: '#ff4d4d',
+      width: 2,
+      value: averageVelocityValue,
+      zIndex: 5, 
+      dashStyle: 'ShortDash',
+      label: {
+        text: `Avg: ${averageVelocityValue}`,
+        align: 'right',
+        verticalAlign: 'bottom',
+        textAlign: 'right',
+        y: -5,
+        style: { color: '#ff4d4d', fontWeight: 'bold' }
       }
-    },
-    series: [
-      { 
-        name: 'Planned', 
-        data: initialAssignedData, 
-        stack: 'assignedGroup', 
-        color: '#8884d8'
-      },
-      { 
-        name: 'Mid-Sprint Added', 
-        data: midSprintData, 
-        stack: 'assignedGroup', 
-        color: '#9bccfeff' 
-      },
-      { 
-        name: 'Completed within sprint', 
-        data: completedTimelyData, 
-        stack: 'completedGroup', 
-        color: '#82ca9d' 
-      },
-      { 
-        name: 'Completed post sprint', 
-        data: completedLateData, 
-        stack: 'completedGroup', 
-        color: '#2e7d32' 
-      }
-    ],
-    tooltip: {
-      shared: true,
-      headerFormat: '<b>{point.x}</b><br/>',
-      pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> <br/>'
-    },
-    credits: { enabled: false }
-  };
+    }] : []
+  },
+  plotOptions: {
+    column: {
+      stacking: 'normal', 
+      dataLabels: { enabled: false }
+    }
+  },
+  series: [
+    { name: 'Planned', data: initialAssignedData, stack: 'assignedGroup', color: '#6366f1' },
+    { name: 'Mid-Sprint Added', data: midSprintData, stack: 'assignedGroup', color: '#a5b4fc' },
+    { name: 'Completed within sprint', data: completedTimelyData, stack: 'completedGroup', color: '#86efac' },
+    { name: 'Completed post sprint', data: completedLateData, stack: 'completedGroup', color: '#22c55e' },
+    
+    // 2. USE A "DUMMY" SERIES JUST FOR THE LEGEND
+    // We set data to null or empty so it doesn't draw a second line
+    {
+      type: 'spline',
+      name: `Avg Velocity (${averageVelocityValue})`,
+      data: [], 
+      color: '#f43f5e',
+      dashStyle: 'ShortDash',
+      marker: { enabled: false },
+      showInLegend: true 
+    }
+  ],
+  tooltip: { 
+    shared: true,
+    // Custom tooltip to show average value even if not hovering on the line
+    footerFormat: `<br/><b>Avg Velocity: ${averageVelocityValue}</b>`
+  },
+  credits: { enabled: false }
+};
 
   return (
     <div style={{ flex: 1, padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
@@ -93,5 +99,4 @@ const RenderChart = ({ title, statsArray, barColor }) => {
     </div>
   );
 };
-
 export default RenderChart

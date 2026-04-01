@@ -103,32 +103,35 @@
 
 // export default HighChartsBarChart
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useSpillageContext } from '../../context/SpillageProvider'
 import RenderChart from './RenderChart'
 import RenderLineChart from './RenderLineChart'
 import UserStoryCard from '../UserStoryCard'
+import DailyScopeTrendChart from './DailyScopeTrendChart'
 
 export const sections = [
     { 
       key: 'all', 
       title: 'All', 
-      barColor: '#8884d8' 
+      barColor: '#6366f1' 
     },
     { 
       key: 'feature', 
       title: 'Feature', 
-      barColor: '#ffc658' 
+      barColor: '#65a30d' 
     },
     { 
       key: 'client', 
       title: 'Client Issues', 
-      barColor: '#ff8042' 
+      barColor: '#8b5cf6' 
     }
   ];
 
 const HighChartsBarChart = ({ data }) => {
   const { loading } = useSpillageContext();
+
+  const [activeSection, setActiveSection] = useState('all');
 
   if (loading || !data) {
     return <div style={{ textAlign: 'center', padding: '50px' }}>Loading Dashboard Data...</div>;
@@ -136,6 +139,11 @@ const HighChartsBarChart = ({ data }) => {
 
   return (
     <div className="dashboard-wrapper">
+
+      <div className="active-section">
+        <button className="set-spillage"></button>
+        <button className="set-stats"></button>
+      </div>
       {/* Individual Bar Charts (Keeping your existing loop) */}
       {/* Single Combined Line Chart */}
       <RenderLineChart 
@@ -146,12 +154,21 @@ const HighChartsBarChart = ({ data }) => {
 
 
       {sections.map((section) => (
-        <div key={section.key} className="section-container">
+        <div key={section.key} className="section-container" style={{ marginBottom: '60px' }}>
+          
+          {/* 1. The Summary Bar Chart (Planned vs Completed) */}
           <RenderChart 
             title={`${section.title}`} 
             statsArray={data[section.key]?.stats || []} 
             barColor={section.barColor} 
           />
+
+          {/* 2. The Daily Scope Trend (The Senior's Request) */}
+          <DailyScopeTrendChart 
+            title={section.title}
+            dailyTrends={data[section.key]?.dailyTrends || []} 
+          />
+          
         </div>
       ))}
     </div>
