@@ -110,6 +110,7 @@ import RenderLineChart from './RenderLineChart'
 import UserStoryCard from '../ImpactedFeaturesCard'
 import DailyScopeTrendChart from './DailyScopeTrendChart'
 import { useDevOpsContext } from '../../context/DevOpsProvider'
+import ImpactedFeaturesCard from '../ImpactedFeaturesCard'
 
 export const sections = [
     { 
@@ -180,8 +181,6 @@ const HighChartsBarChart = ({ data }) => {
   // 1. Pull workType from context
   const { loading, workType } = useDevOpsContext(); 
 
-  const [activeSection, setActiveSection] = useState('all');
-
   // 2. Determine the Label/Unit
   const unitLabel = workType === 'task' ? 'Count' : 'Points';
 
@@ -191,10 +190,6 @@ const HighChartsBarChart = ({ data }) => {
 
   return (
     <div className="dashboard-wrapper">
-      <div className="active-section">
-        <button className="set-spillage"></button>
-        <button className="set-stats"></button>
-      </div>
 
       {/* 3. Pass unitLabel to the Line Chart */}
       <RenderLineChart 
@@ -217,7 +212,7 @@ const HighChartsBarChart = ({ data }) => {
 
           {/* 5. Pass unitLabel to the Daily Scope Trend */}
           <DailyScopeTrendChart 
-            title={`${section.title} Scope Change (${unitLabel})`}
+            title={`${section.title} (${unitLabel})`}
             dailyTrends={data[section.key]?.dailyTrends || []} 
             workType={workType} // Pass this down!
           />

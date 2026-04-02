@@ -2,8 +2,10 @@ import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
-const DailyScopeTrendChart = ({ title, dailyTrends }) => {
+const DailyScopeTrendChart = ({ title, dailyTrends, workType }) => {
   if (!dailyTrends || dailyTrends.length === 0) return null;
+
+  const isTask = workType === 'task';
 
   // 1. Sort/Reverse once so the whole component is in sync (Oldest Sprint first)
   const sortedSprints = [...dailyTrends].sort((a, b) => 
@@ -51,13 +53,13 @@ const DailyScopeTrendChart = ({ title, dailyTrends }) => {
 
   const options = {
     chart: { type: 'area', height: 400 },
-    title: { text: `${title} - Sequential Daily Scope` },
+    title: { text: `${title} - Daily Scope` },
     xAxis: { 
       categories: flatCategories,
       plotBands: bands, // Use the calculated bands
       labels: { rotation: -45, style: { fontSize: '9px' } }
     },
-    yAxis: { title: { text: 'Story Points' }, gridLineDashStyle: 'Dash' },
+    yAxis: { title: { text: isTask ? 'Number of Tasks' : 'Story Points' }, gridLineDashStyle: 'Dash' },
     tooltip: {
       shared: true,
       formatter: function () {

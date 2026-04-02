@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import HighChartsBarChart, { sections } from '../components/burnupChart/HighChartsBarChart';
-import { useSpillageContext } from '../context/SpillageProvider';
 import { useDevOpsContext } from '../context/DevOpsProvider';
 import Selector from '../components/Selector';
-import { Select } from '@mui/material';
+import { width } from 'highcharts';
 import ImpactedFeaturesCard from '../components/ImpactedFeaturesCard';
 
 const DashboardPage = () => {
@@ -16,7 +15,8 @@ const DashboardPage = () => {
     } = useDevOpsContext();
 
     const [activeSection, setActiveSection] = useState('all');
-    console.log("DashboardPage worktype", workType);
+    const currentSection = sections.find(s => s.key === activeSection);
+
 
     return (
         <div className="dashboard-container">
@@ -84,83 +84,78 @@ const DashboardPage = () => {
 
             <div 
               className="work-type-toggle-container" 
-              style={{ margin: '20px auto', width: 'fit-content', display: 'flex' }}
+              style={{ margin: '0px',width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
             >
-                <button 
-                    className={`toggle-btn ${workType === 'story' ? 'active' : ''}`}
-                    onClick={() => setWorkType('story')}
-                >
-                    User Stories
-                </button>
-                <button 
-                    className={`toggle-btn ${workType === 'task' ? 'active' : ''}`}
-                    onClick={() => {
-                      setWorkType('task')
-                    console.log(workType);}}
-      {/* Chart Display */}
-      {data ? (
-        <div className="chart-container">
-          <HighChartsBarChart data={data} />
-          <div className="filter-header">
-            <h3>View Category:</h3>
-            
-            
-            <div className="tab-container">
-            {sections.map(section => (
-                <button
-                key={section.key}
-                className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
-                onClick={() => setActiveSection(section.key)}
-                >
-                    Tasks
-                </button>
+                <div className="workItem" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <button 
+                  style={{backgroundColor : workType === 'story' ? '#a5b4fc' : '', border : workType === 'story' ? '2px solid #6366f1' : ''}}
+                      className={`toggle-btn ${workType === 'story' ? 'active' : ''}`}
+                      onClick={() => setWorkType('story')}
+                  >
+                      User Stories
+                  </button>
+                  <button 
+                  style={{backgroundColor : workType === 'task' ? '#a5b4fc' : '', border : workType === 'task' ? '2px solid #6366f1' : ''}}
+                      className={`toggle-btn ${workType === 'task' ? 'active' : ''}`}
+                      onClick={() => setWorkType('task')}
+                  >
+                      Tasks
+                  </button>
+                </div>
+
+                <div className="chart-info-header" style={{}}>
+                      <h2>
+                          {workType === 'task' ? 'Task Count Analysis' : 'User Story Points Analysis'}
+                      </h2>
+                      <span className="badge">
+                          Unit: {workType === 'task' ? 'Items' : 'Story Points'}
+                      </span>
+                </div>
             </div>
 
             {/* 3. DYNAMIC CHART DISPLAY */}
             {data ? (
-    <div className="chart-container">
-        <div className="chart-info-header">
-            <h2>
-                {workType === 'task' ? 'Task Count Analysis' : 'User Story Points Analysis'}
-        </div>
+              <div className="chart-container">
+                  
+                  
+                  {/* ADD THE KEY PROP HERE */}
+                  <HighChartsBarChart 
+                      key={`${workType}-${timeFrame}`} 
+                      data={data} 
+                      workType={workType}
+                  />
 
-        <hr className="divider" />
+                  <div className="tab-container">
+                    {sections.map(section => (
+                      <button
+                        key={section.key}
+                        className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
+                        onClick={() => setActiveSection(section.key)}
+                        >
+                        {section.title}
+                      </button>
+                    ))}
+                  </div>
 
-        {/* 4. Conditional Rendering */}
-        {data && currentSection && (
-            <div className="active-view-container">
-            <h2 style={{ color: currentSection.barColor }}>
-                {currentSection.title} Features
-            </h2>
-            <span className="badge">
-                Unit: {workType === 'task' ? 'Items' : 'Story Points'}
-            </span>
-        </div>
-        
-        {/* ADD THE KEY PROP HERE */}
-        <HighChartsBarChart 
-            key={`${workType}-${timeFrame}`} 
-            data={data} 
-            workType={workType}
-        />
-    </div>
-) : (
-    <div className="empty-state">
-        <p>Please select a project and team to load {workType === 'task' ? 'task' : 'story'} data.</p>
-    </div>
-)}
+                  {data && currentSection && (
+                      <div className="active-view-container">
+                      <h2 style={{ color: currentSection.barColor }}>
+                          {currentSection.title} Stories
+                      </h2>
+                      
+                      <ImpactedFeaturesCard 
+                          features={data[currentSection.key]?.history || []} 
+                      />
+                      </div>
+                  )}
+              </div>
+          ) : (
+              <div className="empty-state" style={{alignContent : 'center', height : '50vh'}}>
+                  <p>Please select a project and team to load {workType === 'task' ? 'task' : 'story'} data.</p>
+              </div>
+          )}
         </div>
     );
-            
-            <ImpactedFeaturesCard
-                features={data[currentSection.key]?.history || []} 
-            />
-            </div>
-        )}
-            </div>
-        ) : null}
-    </div>
-  );
 }
 
 export default DashboardPage;

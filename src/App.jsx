@@ -10,7 +10,7 @@ function App() {
     <>
       <SpillageProvider>
         <DevOpsProvider>
-          <Navbar/>
+          {/* <Navbar/> */}
           <AppRoutes />
         </DevOpsProvider>
       </SpillageProvider>
