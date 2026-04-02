@@ -33,6 +33,7 @@ const ImpactedFeaturesCard = ({ features }) => {
             <div className="feature-main">
               <div className="feature-identity">
                 <span className="parent-id">#{feature.parentId}</span>
+                <span>{feature.parentTitle}</span>
                 <span className={`status-pill ${feature.parentStatus?.toLowerCase().replace(/\s+/g, '-')}`}>
                   {feature.parentStatus}
                 </span>

@@ -63,6 +63,7 @@ const DashboardPage = () => {
                             type="number" 
                             className="sprint-input"
                             value={lastN} 
+                            min="1"
                             onChange={(e) => setLastN(e.target.value)}
                         />
                     </div>

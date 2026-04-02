@@ -29,7 +29,7 @@ const DevOpsProvider = ({ children }) => {
     }, [selectedProject]);
 
     useEffect(() => {
-        if(selectedProject && selectedTeam) {
+        if(selectedProject && selectedTeam && lastN > 0) {
             fetchData();
         }
     }, [selectedProject, selectedTeam, timeFrame, lastN, workType]);
