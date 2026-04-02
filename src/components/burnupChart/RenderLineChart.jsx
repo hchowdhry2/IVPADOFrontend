@@ -2,7 +2,8 @@ import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts'
 import React from 'react'
 
-const RenderLineChart = ({ title, data, sections }) => {
+const RenderLineChart = ({ title, data, sections, workType }) => {
+  const isTask = workType === 'task';
   // 1. Get categories from the 'all' section to define the X-Axis
   const categories = (data.all?.spillage || []).map(item => 
     item.iterationPath?.split('\\').pop() || 'Sprint'
@@ -18,6 +19,8 @@ const RenderLineChart = ({ title, data, sections }) => {
     lineWidth: 3
   }));
 
+  console.log("workType in RenderLineChart:", workType);
+
   const options = {
     chart: { 
       type: 'line',
@@ -28,14 +31,20 @@ const RenderLineChart = ({ title, data, sections }) => {
       categories: categories,
     },
     yAxis: { 
-      title: { text: 'Spilled Points' },
+      // title: { text: 'Spilled Points' },
+      title: { text: isTask ? 'Spilled Tasks' : 'Spilled Points' },
       min: 0 
     },
     // Allows user to see All, Feature, and Client values in one popup
+    // tooltip: {
+    //   shared: true,
+    //   crosshairs: true
+    // },
     tooltip: {
-      shared: true,
-      crosshairs: true
-    },
+    shared: true,
+    crosshairs: true,
+    valueSuffix: isTask ? ' items' : ' pts' // Add this line
+  },
     series: series, 
     credits: { enabled: false }
   };

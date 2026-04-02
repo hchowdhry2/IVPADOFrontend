@@ -16,6 +16,7 @@ const DevOpsProvider = ({ children }) => {
     const [lastN, setLastN] = useState(6);
     const [timeFrame, setTimeFrame] = useState(null);
     const [data, setData] = useState(null);
+    const [workType, setWorkType] = useState('story'); // Default to story
 
     useEffect(() => {
         fetchProjects();
@@ -31,7 +32,7 @@ const DevOpsProvider = ({ children }) => {
         if(selectedProject && selectedTeam) {
             fetchData();
         }
-    }, [selectedProject, selectedTeam, timeFrame, lastN]);
+    }, [selectedProject, selectedTeam, timeFrame, lastN, workType]);
 
 
     const fetchProjects = async () => {
@@ -53,19 +54,26 @@ const DevOpsProvider = ({ children }) => {
     }
 
     const fetchData = async () => {
-        setLoading(true); 
-        try {
-            const res = await fetchAdo.getSpillageData({projectId: selectedProject, teamId: selectedTeam, timeframe: timeFrame, lastN: lastN});
-            console.log('Fetched spillage data:', res);
-            setData(res); 
-            setError(null);
-        } catch (error) {
-            console.error("Fetch Error:", error);
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
+    setLoading(true); 
+    try {
+        const res = await fetchAdo.getSpillageData({
+            projectId: selectedProject, 
+            teamId: selectedTeam, 
+            timeframe: timeFrame, 
+            lastN: lastN,
+            workType: workType
+        });
+        
+        console.log('Fetched spillage data for:', workType, res);
+        setData(res); 
+        setError(null);
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        setError(error.message);
+    } finally {
+        setLoading(false);
     }
+}
 
     const fetchIterationsStats = async ({selectedProject, selectedTeam, selectedAreaPath}) => {
         try {
@@ -85,6 +93,7 @@ const DevOpsProvider = ({ children }) => {
         selectedTeam, setSelectedTeam,
         lastN, setLastN,
         timeFrame, setTimeFrame,
+        workType, setWorkType,
         }}>
       {children}
     </DevOpsContext.Provider>

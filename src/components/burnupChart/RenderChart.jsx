@@ -2,7 +2,8 @@ import HighchartsReact from 'highcharts-react-official'
 import Highcharts from 'highcharts'
 import React from 'react'
 
-const RenderChart = ({ title, statsArray, barColor }) => {
+const RenderChart = ({ title, statsArray, barColor, workType }) => {
+  const isTask = workType === 'task';
   const getNumericValue = (obj, keys) => {
     for (const k of keys) {
       let v = obj?.[k];
@@ -40,9 +41,11 @@ const options = {
     spacingRight: 20 
   },
   title: { text: title },
+  
   xAxis: { categories: sprintNames },
   yAxis: { 
-    title: { text: 'Story Points' }, 
+    // title: { text: 'Story Points' }, 
+    title: { text: isTask ? 'Number of Tasks' : 'Story Points' },
     stackLabels: { enabled: true },
     // 1. USE PLOTLINES FOR THE EDGE-TO-EDGE VISUAL
     plotLines: averageVelocityValue > 0 ? [{
@@ -52,8 +55,10 @@ const options = {
       zIndex: 5, 
       dashStyle: 'ShortDash',
       label: {
-        text: `Avg: ${averageVelocityValue}`,
+        // text: `Avg: ${averageVelocityValue}`,
+        text: `${isTask ? 'Avg Throughput' : 'Avg Velocity'}: ${averageVelocityValue}`,
         align: 'right',
+        allowOverlap: true,
         verticalAlign: 'bottom',
         textAlign: 'right',
         y: -5,
@@ -77,7 +82,8 @@ const options = {
     // We set data to null or empty so it doesn't draw a second line
     {
       type: 'spline',
-      name: `Avg Velocity (${averageVelocityValue})`,
+      // name: `Avg Velocity (${averageVelocityValue})`,
+      name: `${isTask ? 'Avg Throughput' : 'Avg Velocity'} (${averageVelocityValue})`,
       data: [], 
       color: '#f43f5e',
       dashStyle: 'ShortDash',
@@ -88,7 +94,9 @@ const options = {
   tooltip: { 
     shared: true,
     // Custom tooltip to show average value even if not hovering on the line
-    footerFormat: `<br/><b>Avg Velocity: ${averageVelocityValue}</b>`
+    // footerFormat: `<br/><b>Avg Velocity: ${averageVelocityValue}</b>`
+    footerFormat: `<br/><b>${isTask ? 'Avg Throughput' : 'Avg Velocity'}: ${averageVelocityValue}</b>`,
+    pointFormat: `<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}</b> ${isTask ? 'items' : 'pts'}<br/>`
   },
   credits: { enabled: false }
 };

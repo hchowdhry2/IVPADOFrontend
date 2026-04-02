@@ -4,25 +4,25 @@ export const fetchAdo = {
     getProjects: async () => {
         try {
             const response = await apiConfigDevops.get('/devops-projects');
-            return response.data.value; // Return the list of projects
+            return response.data.value; 
         } catch (error) {
             console.error('Error fetching projects:', error);
             return [];
         }
     },
-    getTeams : async (projectId) => {
+
+    getTeams: async (projectId) => {
         try {
-            console.log('Fetching teams for project:', projectId);
             const response = await apiConfigDevops.get(`/devops-teams/${projectId}`);
-            return response.data; // Return the list of teams
+            return response.data; 
         } catch (error) {
             console.error('Error fetching teams:', error);
             return [];
         }
     },
-    getIterationStats : async ({projectId, teamId, areaPath, lastNSprints}) => {
+
+    getIterationStats: async ({ projectId, teamId, areaPath, lastNSprints }) => {
         try {
-            // Encode the areaPath to handle spaces and special characters safely
             const safeAreaPath = encodeURIComponent(areaPath); 
             const response = await apiConfigDevops.get(
                 `/devops-iteration-stats/${projectId}/${teamId}/${safeAreaPath}?lastNSprints=${lastNSprints}`
@@ -33,21 +33,27 @@ export const fetchAdo = {
             return null;
         }
     },
-    getSpillageData : async ({projectId, teamId, timeframe, lastN}) => {
+
+    getSpillageData: async ({ projectId, teamId, timeframe, lastN, workType }) => {
         try {
+            // Encode teamId because it usually contains spaces (e.g., "IVP-SRM Team")
+            const safeTeamId = encodeURIComponent(teamId);
+            
+            let url = `?projectId=${projectId}&teamId=${safeTeamId}&n=${lastN}`;
+            
             if (timeframe) {
-                const response = await apiConfig.get(
-                `?projectId=${projectId}&teamId=${teamId}&timeframe=${timeframe}&n=${lastN}`
-                );
-                return response.data;
+                url += `&timeframe=${timeframe}`;
             }
-            const response = await apiConfig.get(
-                `?projectId=${projectId}&teamId=${teamId}&n=${lastN}`
-            );
+            
+            if (workType) {
+                url += `&workType=${workType}`;
+            }
+
+            const response = await apiConfig.get(url);
             return response.data;
         } catch (error) {
             console.error('Error fetching spillage data:', error);
             return null;
         }
-    }
-}
+    } // This brace closes getSpillageData
+}; // This brace closes the fetchAdo object

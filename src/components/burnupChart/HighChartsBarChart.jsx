@@ -109,6 +109,7 @@ import RenderChart from './RenderChart'
 import RenderLineChart from './RenderLineChart'
 import UserStoryCard from '../UserStoryCard'
 import DailyScopeTrendChart from './DailyScopeTrendChart'
+import { useDevOpsContext } from '../../context/DevOpsProvider'
 
 export const sections = [
     { 
@@ -128,10 +129,61 @@ export const sections = [
     }
   ];
 
+// const HighChartsBarChart = ({ data }) => {
+//   const { loading } = useSpillageContext();
+
+//   const [activeSection, setActiveSection] = useState('all');
+
+//   if (loading || !data) {
+//     return <div style={{ textAlign: 'center', padding: '50px' }}>Loading Dashboard Data...</div>;
+//   }
+
+//   return (
+//     <div className="dashboard-wrapper">
+
+//       <div className="active-section">
+//         <button className="set-spillage"></button>
+//         <button className="set-stats"></button>
+//       </div>
+//       {/* Individual Bar Charts (Keeping your existing loop) */}
+//       {/* Single Combined Line Chart */}
+//       <RenderLineChart 
+//         title="Spillage" 
+//         data={data} 
+//         sections={sections} 
+//       />
+
+
+//       {sections.map((section) => (
+//         <div key={section.key} className="section-container" style={{ marginBottom: '60px' }}>
+          
+//           {/* 1. The Summary Bar Chart (Planned vs Completed) */}
+//           <RenderChart 
+//             title={`${section.title}`} 
+//             statsArray={data[section.key]?.stats || []} 
+//             barColor={section.barColor} 
+//           />
+
+//           {/* 2. The Daily Scope Trend (The Senior's Request) */}
+//           <DailyScopeTrendChart 
+//             title={section.title}
+//             dailyTrends={data[section.key]?.dailyTrends || []} 
+//           />
+          
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }
+
 const HighChartsBarChart = ({ data }) => {
-  const { loading } = useSpillageContext();
+  // 1. Pull workType from context
+  const { loading, workType } = useDevOpsContext(); 
 
   const [activeSection, setActiveSection] = useState('all');
+
+  // 2. Determine the Label/Unit
+  const unitLabel = workType === 'task' ? 'Count' : 'Points';
 
   if (loading || !data) {
     return <div style={{ textAlign: 'center', padding: '50px' }}>Loading Dashboard Data...</div>;
@@ -139,34 +191,35 @@ const HighChartsBarChart = ({ data }) => {
 
   return (
     <div className="dashboard-wrapper">
-
       <div className="active-section">
         <button className="set-spillage"></button>
         <button className="set-stats"></button>
       </div>
-      {/* Individual Bar Charts (Keeping your existing loop) */}
-      {/* Single Combined Line Chart */}
+
+      {/* 3. Pass unitLabel to the Line Chart */}
       <RenderLineChart 
-        title="Spillage" 
+        title={`Spillage (${unitLabel})`} 
         data={data} 
         sections={sections} 
+        workType={workType} // Pass this down!
       />
-
 
       {sections.map((section) => (
         <div key={section.key} className="section-container" style={{ marginBottom: '60px' }}>
           
-          {/* 1. The Summary Bar Chart (Planned vs Completed) */}
+          {/* 4. Pass unitLabel to the Summary Bar Chart */}
           <RenderChart 
-            title={`${section.title}`} 
+            title={`${section.title} - ${unitLabel} Analysis`} 
             statsArray={data[section.key]?.stats || []} 
             barColor={section.barColor} 
+            workType={workType} // Pass this down!
           />
 
-          {/* 2. The Daily Scope Trend (The Senior's Request) */}
+          {/* 5. Pass unitLabel to the Daily Scope Trend */}
           <DailyScopeTrendChart 
-            title={section.title}
+            title={`${section.title} Scope Change (${unitLabel})`}
             dailyTrends={data[section.key]?.dailyTrends || []} 
+            workType={workType} // Pass this down!
           />
           
         </div>
