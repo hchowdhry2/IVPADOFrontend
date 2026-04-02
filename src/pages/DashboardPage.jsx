@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import HighChartsBarChart, { sections } from '../components/burnupChart/HighChartsBarChart';
+import { useSpillageContext } from '../context/SpillageProvider';
 import { useDevOpsContext } from '../context/DevOpsProvider';
 import Selector from '../components/Selector';
+import { Select } from '@mui/material';
+import ImpactedFeaturesCard from '../components/ImpactedFeaturesCard';
 
 const DashboardPage = () => {
     // 1. Pull workType and setWorkType from your Context
@@ -94,6 +97,20 @@ const DashboardPage = () => {
                     onClick={() => {
                       setWorkType('task')
                     console.log(workType);}}
+      {/* Chart Display */}
+      {data ? (
+        <div className="chart-container">
+          <HighChartsBarChart data={data} />
+          <div className="filter-header">
+            <h3>View Category:</h3>
+            
+            
+            <div className="tab-container">
+            {sections.map(section => (
+                <button
+                key={section.key}
+                className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
+                onClick={() => setActiveSection(section.key)}
                 >
                     Tasks
                 </button>
@@ -105,6 +122,15 @@ const DashboardPage = () => {
         <div className="chart-info-header">
             <h2>
                 {workType === 'task' ? 'Task Count Analysis' : 'User Story Points Analysis'}
+        </div>
+
+        <hr className="divider" />
+
+        {/* 4. Conditional Rendering */}
+        {data && currentSection && (
+            <div className="active-view-container">
+            <h2 style={{ color: currentSection.barColor }}>
+                {currentSection.title} Features
             </h2>
             <span className="badge">
                 Unit: {workType === 'task' ? 'Items' : 'Story Points'}
@@ -125,6 +151,16 @@ const DashboardPage = () => {
 )}
         </div>
     );
+            
+            <ImpactedFeaturesCard
+                features={data[currentSection.key]?.history || []} 
+            />
+            </div>
+        )}
+            </div>
+        ) : null}
+    </div>
+  );
 }
 
 export default DashboardPage;

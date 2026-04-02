@@ -50,7 +50,7 @@ const options = {
     // 1. USE PLOTLINES FOR THE EDGE-TO-EDGE VISUAL
     plotLines: averageVelocityValue > 0 ? [{
       color: '#ff4d4d',
-      width: 2,
+      width: 3,
       value: averageVelocityValue,
       zIndex: 5, 
       dashStyle: 'ShortDash',

@@ -107,7 +107,7 @@ import React, { useState } from 'react'
 import { useSpillageContext } from '../../context/SpillageProvider'
 import RenderChart from './RenderChart'
 import RenderLineChart from './RenderLineChart'
-import UserStoryCard from '../UserStoryCard'
+import UserStoryCard from '../ImpactedFeaturesCard'
 import DailyScopeTrendChart from './DailyScopeTrendChart'
 import { useDevOpsContext } from '../../context/DevOpsProvider'
 
