@@ -45,16 +45,38 @@ const DashboardPage = () => {
                 <Selector
                     options={projects}
                     setValue={setSelectedProject}
-                    title="Select Project:"
+                    title="Project"
                 />
 
                 {selectedProject && (
                     <Selector
                         options={teams}
                         setValue={setSelectedTeam}
-                        title="Select Team:"
+                        title="Team"
                     />
                 )}
+
+                <div 
+                  className="work-type-toggle-container" 
+                  style={{ margin: '0px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
+                >
+                    <div className="workItem" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <button 
+                      style={{backgroundColor : workType === 'story' ? '#a5b4fc' : '', border : workType === 'story' ? '2px solid #6366f1' : ''}}
+                          className={`toggle-btn ${workType === 'story' ? 'active' : ''}`}
+                          onClick={() => setWorkType('story')}
+                      >
+                          User Stories
+                      </button>
+                      <button 
+                      style={{backgroundColor : workType === 'task' ? '#a5b4fc' : '', border : workType === 'task' ? '2px solid #6366f1' : ''}}
+                          className={`toggle-btn ${workType === 'task' ? 'active' : ''}`}
+                          onClick={() => setWorkType('task')}
+                      >
+                          Tasks
+                      </button>
+                    </div>
+                </div>
 
                 <div className="controls-container">
                     <div className="filter-group">
@@ -83,36 +105,7 @@ const DashboardPage = () => {
                 </div>
             </div>
 
-            <div 
-              className="work-type-toggle-container" 
-              style={{ margin: '0px',width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
-            >
-                <div className="workItem" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <button 
-                  style={{backgroundColor : workType === 'story' ? '#a5b4fc' : '', border : workType === 'story' ? '2px solid #6366f1' : ''}}
-                      className={`toggle-btn ${workType === 'story' ? 'active' : ''}`}
-                      onClick={() => setWorkType('story')}
-                  >
-                      User Stories
-                  </button>
-                  <button 
-                  style={{backgroundColor : workType === 'task' ? '#a5b4fc' : '', border : workType === 'task' ? '2px solid #6366f1' : ''}}
-                      className={`toggle-btn ${workType === 'task' ? 'active' : ''}`}
-                      onClick={() => setWorkType('task')}
-                  >
-                      Tasks
-                  </button>
-                </div>
-
-                <div className="chart-info-header" style={{}}>
-                      <h2>
-                          {workType === 'task' ? 'Task Count Analysis' : 'User Story Points Analysis'}
-                      </h2>
-                      <span className="badge">
-                          Unit: {workType === 'task' ? 'Items' : 'Story Points'}
-                      </span>
-                </div>
-            </div>
+            
 
             {/* 3. DYNAMIC CHART DISPLAY */}
             {data ? (
