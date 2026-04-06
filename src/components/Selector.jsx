@@ -8,11 +8,12 @@ const Selector = ({ options, setValue, title}) => {
   return (
    <>
     <div className="filter-group">
-          <h3>{title}</h3>
+          <h3>Select {title}:</h3>
           <select 
             className="select-dropdown" 
             onChange={e => setValue(e.target.value)}
           >
+            <option value="">--Select {title}--</option>
             {options.map((option,idx) => (
               <option key={option.id || idx} value={option.value}>
                 {option.name || option.value}

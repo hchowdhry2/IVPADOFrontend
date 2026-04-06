@@ -41,7 +41,7 @@ const ImpactedFeaturesCard = ({ features }) => {
               
               <div className="feature-metrics">
                 <div className="metric-group">
-                  <span className="metric-label">Impacted Stories</span>
+                  <span className="metric-label">Total Stories</span>
                   <span className="metric-value">{feature.totalStoryCount}</span>
                 </div>
                 <div className="metric-divider" />
