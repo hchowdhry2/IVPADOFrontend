@@ -53,23 +53,45 @@ const DevOpsProvider = ({ children }) => {
         }
     }
 
-    const fetchData = async () => {
+//     const fetchData = async () => {
+//     setLoading(true); 
+//     try {
+//         const res = await fetchAdo.getSpillageData({
+//             projectId: selectedProject, 
+//             teamId: selectedTeam, 
+//             timeframe: timeFrame, 
+//             lastN: lastN,
+//             workType: workType
+//         });
+        
+//         console.log('Fetched spillage data for:', workType, res);
+//         setData(res); 
+//         setError(null);
+//     } catch (error) {
+//         console.error("Fetch Error:", error);
+//         setError(error.message);
+//     } finally {
+//         setLoading(false);
+//     }
+// }
+
+const fetchData = async () => {
+    // 1. CLEAR the old data immediately so charts don't show "stale" numbers
+    setData(null); 
     setLoading(true); 
+    
     try {
         const res = await fetchAdo.getSpillageData({
             projectId: selectedProject, 
             teamId: selectedTeam, 
             timeframe: timeFrame, 
             lastN: lastN,
-            workType: workType
+            workType: workType 
         });
         
-        console.log('Fetched spillage data for:', workType, res);
         setData(res); 
-        setError(null);
     } catch (error) {
-        console.error("Fetch Error:", error);
-        setError(error.message);
+        console.error(error);
     } finally {
         setLoading(false);
     }
