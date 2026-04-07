@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Selector = ({ options, setValue, title}) => {
+const Selector = ({ options, setValue, title, value}) => {
 
     if(!options || options.length === 0) {
         return <p>Loading...</p>;
@@ -13,7 +13,7 @@ const Selector = ({ options, setValue, title}) => {
             className="select-dropdown" 
             onChange={e => setValue(e.target.value)}
           >
-            <option value="">--Select {title}--</option>
+            <option value={value || ''}>--Select {title}--</option>
             {options.map((option,idx) => (
               <option key={option.id || idx} value={option.value}>
                 {option.name || option.value}
