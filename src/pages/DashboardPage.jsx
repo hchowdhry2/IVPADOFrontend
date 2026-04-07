@@ -14,7 +14,7 @@ const DashboardPage = () => {
         workType, setWorkType // Ensure these are exported from your Provider
     } = useDevOpsContext();
 
-    const [activeSection, setActiveSection] = useState('all');
+    const [activeSection, setActiveSection] = useState('feature');
     const currentSection = sections.find(s => s.key === activeSection);
 
 
@@ -43,6 +43,7 @@ const DashboardPage = () => {
 
             <div className="filter-row">
                 <Selector
+                    value={selectedProject}
                     options={projects}
                     setValue={setSelectedProject}
                     title="Project"
@@ -50,6 +51,7 @@ const DashboardPage = () => {
 
                 {selectedProject && (
                     <Selector
+                        value={selectedTeam}
                         options={teams}
                         setValue={setSelectedTeam}
                         title="Team"
@@ -120,7 +122,7 @@ const DashboardPage = () => {
                   />
 
                   <div className="tab-container">
-                    {sections.map(section => (
+                    {sections.filter(section => section.key !== 'all').map(section => (
                       <button
                         key={section.key}
                         className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
