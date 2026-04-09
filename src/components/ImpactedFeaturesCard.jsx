@@ -23,7 +23,7 @@ const ImpactedFeaturesCard = ({ features }) => {
   return (
     <div className="dashboard-section modern-theme">
       <div className="section-header">
-        <h3>Feature Impact Analysis ({sortedFeatures.length})</h3>
+        <h3>Parent Impact Analysis ({sortedFeatures.length})</h3>
         <p className="subtitle">Ranking by total delivery friction (iteration transitions)</p>
       </div>
 
@@ -54,16 +54,6 @@ const ImpactedFeaturesCard = ({ features }) => {
               </div>
             </div>
             
-            {/* Aesthetic Progress Indicator */}
-            {/* <div className="friction-bar-container">
-               <div 
-                 className="friction-bar-fill" 
-                 style={{ 
-                   width: `${Math.min((feature.totalImpactScore / (feature.totalStoryCount || 1)) * 20, 100)}%`,
-                   backgroundColor: feature.totalImpactScore > feature.totalStoryCount * 3 ? '#ef4444' : '#6366f1'
-                 }} 
-               />
-            </div> */}
           </div>
         ))}
       </div>
