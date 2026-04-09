@@ -1,24 +1,33 @@
 import React, { useMemo } from 'react';
+import { HistoryItem } from '../services/fetchService';
 
-const ImpactedFeaturesCard = ({ features }) => {
+// 1. Define the Props interface
+interface ImpactedFeaturesCardProps {
+  features: HistoryItem[];
+}
+
+const ImpactedFeaturesCard: React.FC<ImpactedFeaturesCardProps> = ({ features }) => {
+  
   // Performance: Sort by the new Total Impact Score (Churn)
   const sortedFeatures = useMemo(() => {
     if (!Array.isArray(features)) return [];
+    // TypeScript now knows 'totalImpactScore' is a number
     return [...features].sort((a, b) => 
       (b.totalImpactScore || 0) - (a.totalImpactScore || 0)
     );
   }, [features]);
 
   // Aesthetic Logic: Color based on "Friction"
-  // Friction is high if impact score is significantly higher than story count
-  const getImpactColor = (score, count) => {
+  const getImpactColor = (score: number, count: number): string => {
     if (score === 0) return 'status-stable';
     if (score > count * 3) return 'status-critical'; // Red: Average 3+ moves per story
     if (score > count) return 'status-warning';     // Amber: Significant spillage
     return 'status-info';                           // Blue: Normal movement
   };
 
-  if (sortedFeatures.length === 0) return <p className="no-data">No impacted features found.</p>;
+  if (sortedFeatures.length === 0) {
+    return <p className="no-data">No impacted features found.</p>;
+  }
 
   return (
     <div className="dashboard-section modern-theme">
@@ -34,6 +43,7 @@ const ImpactedFeaturesCard = ({ features }) => {
               <div className="feature-identity">
                 <span className="parent-id">#{feature.parentId}</span>
                 <span>{feature.parentTitle}</span>
+                {/* Safe access to optional parentStatus */}
                 <span className={`status-pill ${feature.parentStatus?.toLowerCase().replace(/\s+/g, '-')}`}>
                   {feature.parentStatus}
                 </span>
@@ -53,7 +63,6 @@ const ImpactedFeaturesCard = ({ features }) => {
                 </div>
               </div>
             </div>
-            
           </div>
         ))}
       </div>

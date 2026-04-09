@@ -1,8 +1,8 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
 export const API_BASE_URL = 'https://localhost:7043/api';
 
-export const apiConfig = axios.create({
+export const apiConfig: AxiosInstance = axios.create({
     baseURL: `${API_BASE_URL}/Spillage`,
     headers: {
         'Content-Type': 'application/json',
