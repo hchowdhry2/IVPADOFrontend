@@ -50,11 +50,20 @@ export interface HistoryItem {
     totalImpactScore: number;
 }
 
+export interface DeveloperStat {
+    developer: string;
+    sprint: string;
+    totalTasksAssigned: number;
+    totalTasksCompleted: number;
+    totalHours: number;
+}
+
 export interface SpillageCategory {
     stats: SprintStat[];
     spillage: SpillagePoint[];
     history: HistoryItem[];
-    dailyTrends?: SprintTrend[]; // Optional, as it may not be present in all responses
+    dailyTrends?: SprintTrend[]; // optional
+    developerStats?: DeveloperStat[]; // optional, will always be there in task data but not in story data
 }
 
 // The root response is a dictionary (e.g., "all", "Feature", "Client")

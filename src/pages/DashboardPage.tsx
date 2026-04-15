@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-// Note: Ensure HighChartsBarChart is converted to .tsx for the 'sections' import to be typed
 import HighChartsBarChart, { sections } from '../components/burnupChart/HighChartsBarChart';
 import { useDevOpsContext } from '../context/DevOpsProvider';
 import Selector from '../components/Selector';
 import ImpactedFeaturesCard from '../components/ImpactedFeaturesCard';
+import DeveloperPerformanceGrid from '../components/DeveloperPerformanceGrid'; // Updated name for clarity
+import DeveloperBarChart from '../components/burnupChart/DeveloperBarChart'; // Added this import
 
 const DashboardPage: React.FC = () => {
     const {
@@ -17,9 +18,7 @@ const DashboardPage: React.FC = () => {
         workType, setWorkType 
     } = useDevOpsContext();
 
-    // activeSection is one of the keys in our data response (all, feature, client, etc.)
     const [activeSection, setActiveSection] = useState<string>('feature');
-    
     const currentSection = sections.find(s => s.key === activeSection);
 
     return (
@@ -31,7 +30,7 @@ const DashboardPage: React.FC = () => {
             <div className="filter-row">
                 <Selector
                     value={selectedProject}
-                    options={projects} // Typed as AdoProject[]
+                    options={projects}
                     setValue={setSelectedProject}
                     title="Project"
                 />
@@ -39,29 +38,27 @@ const DashboardPage: React.FC = () => {
                 {selectedProject && (
                     <Selector
                         value={selectedTeam}
-                        options={teams} // Typed as AdoTeam[]
+                        options={teams}
                         setValue={setSelectedTeam}
                         title="Team"
                     />
                 )}
 
-                <div className="work-type-toggle-container" style={{ margin: '0px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <div className="workItem" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <button 
-                            style={{ backgroundColor: workType === 'story' ? '#a5b4fc' : '', border: workType === 'story' ? '2px solid #6366f1' : '' }}
-                            className={`toggle-btn ${workType === 'story' ? 'active' : ''}`}
-                            onClick={() => setWorkType('story')}
-                        >
-                            User Stories
-                        </button>
-                        <button 
-                            style={{ backgroundColor: workType === 'task' ? '#a5b4fc' : '', border: workType === 'task' ? '2px solid #6366f1' : '' }}
-                            className={`toggle-btn ${workType === 'task' ? 'active' : ''}`}
-                            onClick={() => setWorkType('task')}
-                        >
-                            Tasks
-                        </button>
-                    </div>
+                <div className="work-type-toggle-container" style={{ display: 'flex', gap: '10px' }}>
+                    <button 
+                        style={{ backgroundColor: workType === 'story' ? '#a5b4fc' : '', border: workType === 'story' ? '2px solid #6366f1' : '' }}
+                        className={`toggle-btn ${workType === 'story' ? 'active' : ''}`}
+                        onClick={() => setWorkType('story')}
+                    >
+                        User Stories
+                    </button>
+                    <button 
+                        style={{ backgroundColor: workType === 'task' ? '#a5b4fc' : '', border: workType === 'task' ? '2px solid #6366f1' : '' }}
+                        className={`toggle-btn ${workType === 'task' ? 'active' : ''}`}
+                        onClick={() => setWorkType('task')}
+                    >
+                        Tasks
+                    </button>
                 </div>
 
                 <div className="controls-container">
@@ -72,11 +69,9 @@ const DashboardPage: React.FC = () => {
                             className="sprint-input"
                             value={lastN} 
                             min="1"
-                            // Handle event typing: cast e.target.value to number
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastN(parseInt(e.target.value) || 0)}
                         />
                     </div>
-
                     <div className="filter-group">
                         <select 
                             className="select-dropdown"
@@ -96,11 +91,43 @@ const DashboardPage: React.FC = () => {
                 <div className="chart-container">
                     <HighChartsBarChart 
                         key={`${workType}-${timeFrame}`} 
-                        data={data} // Typed as SpillageDataResponse
+                        data={data} 
                         workType={workType}
                     />
 
-                    <div className="tab-container">
+                    {/* <div className="tab-container" style={{ marginTop: '20px' }}>
+                        {sections.filter(section => section.key !== 'all').map(section => (
+                            <button
+                                key={section.key}
+                                className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
+                                onClick={() => setActiveSection(section.key)}
+                            >
+                                {section.title}
+                            </button>
+                        ))}
+                    </div> */}
+
+                    {currentSection && (
+                        <div className="active-view-container">
+                            {/* <h2 style={{ color: currentSection.barColor, marginBottom: '20px' }}>
+                                {currentSection.title} {workType === 'task' ? 'Tasks' : 'Stories'}
+                            </h2> */}
+
+                            {/* 1. Developer Bar Chart - Visual Distribution */}
+                            {/* {workType === 'task' && data[currentSection.key]?.developerStats && (
+                                <div style={{ marginBottom: '30px' }}>
+                                    <DeveloperBarChart stats={data[currentSection.key].developerStats ?? []} />
+                                </div>
+                            )} */}
+
+                            
+                            {workType === 'task' && data['all']?.developerStats && (
+                                <div style={{ marginBottom: '30px' }}>
+                                    <DeveloperBarChart stats={data['all'].developerStats} />
+                                </div>
+                            )}
+
+                            <div className="tab-container" style={{ marginTop: '20px' }}>
                         {sections.filter(section => section.key !== 'all').map(section => (
                             <button
                                 key={section.key}
@@ -111,22 +138,35 @@ const DashboardPage: React.FC = () => {
                             </button>
                         ))}
                     </div>
-
-                    {currentSection && (
-                        <div className="active-view-container">
-                            <h2 style={{ color: currentSection.barColor }}>
+                            <h2 style={{ color: currentSection.barColor, marginBottom: '20px' }}>
                                 {currentSection.title} {workType === 'task' ? 'Tasks' : 'Stories'}
                             </h2>
-                            
-                            <ImpactedFeaturesCard 
-                                // Safe access using optional chaining because data is SpillageDataResponse
-                                features={data[currentSection.key]?.history || []} 
-                            />
+
+                            {/* 2. Impacted Features Card - First in stack */}
+                            <div style={{ marginBottom: '30px' }}>
+                                <ImpactedFeaturesCard 
+                                    features={data[currentSection.key]?.history || []} 
+                                />
+                            </div>
+
+                            {/* 3. Developer Performance Grid - Second in stack */}
+                            {workType === 'task' && (
+                                <div style={{ marginBottom: '30px' }}>
+                                    <DeveloperPerformanceGrid 
+                                        stats={data[currentSection.key]?.developerStats || []} 
+                                    />
+                                </div>
+                            )}
+                            {/* {workType === 'task' && data['all']?.developerStats && (
+                                <div style={{ marginBottom: '30px' }}>
+                                    <DeveloperBarChart stats={data['all'].developerStats} />
+                                </div>
+                            )} */}
                         </div>
                     )}
-                </div>
+                </div> /* Closed chart-container */
             ) : (
-                <div className="empty-state" style={{ alignContent: 'center', height: '50vh' }}>
+                <div className="empty-state" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
                     <p>Please select a project and team to load {workType === 'task' ? 'task' : 'story'} data.</p>
                 </div>
             )}
