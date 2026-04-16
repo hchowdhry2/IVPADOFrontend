@@ -5,6 +5,8 @@ import Selector from '../components/Selector';
 import ImpactedFeaturesCard from '../components/ImpactedFeaturesCard';
 import DeveloperPerformanceGrid from '../components/DeveloperPerformanceGrid'; // Updated name for clarity
 import DeveloperBarChart from '../components/burnupChart/DeveloperBarChart'; // Added this import
+import DeveloperTrendChart from '../components/burnupChart/DeveloperTrendChart';
+import SingleDeveloperBarChart from '../components/burnupChart/SingleDeveloperBarChart';
 
 const DashboardPage: React.FC = () => {
     const {
@@ -19,6 +21,7 @@ const DashboardPage: React.FC = () => {
     } = useDevOpsContext();
 
     const [activeSection, setActiveSection] = useState<string>('feature');
+    const [activeView, setActiveView] = useState<string>('Project'); 
     const currentSection = sections.find(s => s.key === activeSection);
 
     return (
@@ -58,6 +61,23 @@ const DashboardPage: React.FC = () => {
                         onClick={() => setWorkType('task')}
                     >
                         Tasks
+                    </button>
+                </div>
+
+                <div className="view-level-container">
+                    <button 
+                        className={`view-btn ${activeView === 'Project' ? 'active' : ''}`} 
+                        style={{backgroundColor : activeView === 'Project' ? '#a5b4fc' : '', border: activeView === 'Project' ? '2px solid #6366f1' : ''}}
+                        onClick={() => setActiveView('Project')}
+                    >
+                        Project View
+                    </button>
+                    <button 
+                        className={`view-btn ${activeView === 'Developer' ? 'active' : ''}`} 
+                        style={{backgroundColor : activeView === 'Developer' ? '#a5b4fc' : '', border: activeView === 'Developer' ? '2px solid #6366f1' : ''}}
+                        onClick={() => setActiveView('Developer')}
+                    >
+                        Developer View
                     </button>
                 </div>
 
@@ -107,7 +127,7 @@ const DashboardPage: React.FC = () => {
                         ))}
                     </div> */}
 
-                    {currentSection && (
+                    {currentSection && activeView === 'Project' && (
                         <div className="active-view-container">
                             {/* <h2 style={{ color: currentSection.barColor, marginBottom: '20px' }}>
                                 {currentSection.title} {workType === 'task' ? 'Tasks' : 'Stories'}
@@ -120,24 +140,17 @@ const DashboardPage: React.FC = () => {
                                 </div>
                             )} */}
 
-                            
-                            {workType === 'task' && data['all']?.developerStats && (
-                                <div style={{ marginBottom: '30px' }}>
-                                    <DeveloperBarChart stats={data['all'].developerStats} />
-                                </div>
-                            )}
-
                             <div className="tab-container" style={{ marginTop: '20px' }}>
-                        {sections.filter(section => section.key !== 'all').map(section => (
-                            <button
-                                key={section.key}
-                                className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
-                                onClick={() => setActiveSection(section.key)}
-                            >
-                                {section.title}
-                            </button>
-                        ))}
-                    </div>
+                                {sections.filter(section => section.key !== 'all').map(section => (
+                                    <button
+                                        key={section.key}
+                                        className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
+                                        onClick={() => setActiveSection(section.key)}
+                                    >
+                                        {section.title}
+                                    </button>
+                                ))}
+                            </div>
                             <h2 style={{ color: currentSection.barColor, marginBottom: '20px' }}>
                                 {currentSection.title} {workType === 'task' ? 'Tasks' : 'Stories'}
                             </h2>
@@ -149,19 +162,27 @@ const DashboardPage: React.FC = () => {
                                 />
                             </div>
 
-                            {/* 3. Developer Performance Grid - Second in stack */}
-                            {workType === 'task' && (
-                                <div style={{ marginBottom: '30px' }}>
-                                    <DeveloperPerformanceGrid 
-                                        stats={data[currentSection.key]?.developerStats || []} 
-                                    />
-                                </div>
-                            )}
                             {/* {workType === 'task' && data['all']?.developerStats && (
                                 <div style={{ marginBottom: '30px' }}>
                                     <DeveloperBarChart stats={data['all'].developerStats} />
                                 </div>
                             )} */}
+                        </div>
+                    )}
+
+                    {currentSection && activeView === 'Developer' && workType === 'task' && data['all']?.developerStats && (
+                        <div className="active-dev-container">
+                            <div style={{ marginBottom: '30px' }}>
+                                    <DeveloperBarChart stats={data['all'].developerStats} />
+                                    {/* <DeveloperTrendChart stats={data['all'].developerStats} /> */}
+                                    <SingleDeveloperBarChart stats={data['all'].developerStats} />
+                            </div>
+
+                            <div style={{ marginBottom: '30px' }}>
+                                    <DeveloperPerformanceGrid 
+                                        stats={data[currentSection.key]?.developerStats || []} 
+                                    />
+                            </div>
                         </div>
                     )}
                 </div> /* Closed chart-container */
