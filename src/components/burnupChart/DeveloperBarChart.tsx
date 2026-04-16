@@ -11,8 +11,15 @@ const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats }) => {
     
     const { categories, seriesData, plotBands, plotLines } = useMemo(() => {
         // 1. Get unique sprints sorted
-        const sprints = Array.from(new Set(stats.map(s => s.sprint))).sort();
-        
+        // const sprints = Array.from(new Set(stats.map(s => s.sprint))).sort();
+        const sprints: string[] = [];
+        stats.forEach(s => {
+            if (!sprints.includes(s.sprint)) {
+                sprints.push(s.sprint);
+            }
+        });
+        sprints.reverse();
+
         // 2. Get unique developers in a consistent order (Alphabetical)
         const masterDevList = Array.from(new Set(stats.map(s => s.developer))).sort();
         
@@ -101,7 +108,7 @@ const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats }) => {
             tickInterval: 1,
             tickLength: 0,
             gridLineWidth: 0
-        } as Highcharts.XAxisOptions,
+        } ,
         yAxis: {
             min: 0,
             title: { text: 'Total Tasks Assigned' },
