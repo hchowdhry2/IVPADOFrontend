@@ -2,6 +2,7 @@ import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { SprintStat } from '../../services/fetchService';
+import LoadingSkeleton from '../LoadingSkeleton';
 
 // 1. Define the Props Interface
 interface RenderChartProps {
@@ -9,9 +10,14 @@ interface RenderChartProps {
   statsArray: SprintStat[];
   barColor: string;
   workType: 'story' | 'task';
+  loading?: boolean;
 }
 
-const RenderChart: React.FC<RenderChartProps> = ({ title, statsArray, barColor, workType }) => {
+const RenderChart: React.FC<RenderChartProps> = ({ title, statsArray, barColor, workType, loading = false }) => {
+  if (loading || statsArray.length === 0) {
+    return <LoadingSkeleton type="chart" height="350px" />;
+  }
+
   const isTask = workType === 'task';
 
   // 2. Type-safe helper for numeric values

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import LoadingSkeleton from '../LoadingSkeleton';
 
 interface Stat {
     sprint: string;
@@ -12,13 +13,18 @@ interface Stat {
 
 interface DeveloperTrendChartProps {
     stats: Stat[];
+    loading?: boolean;
 }
 
-const DeveloperTrendChart: React.FC<DeveloperTrendChartProps> = ({ stats }) => {
+const DeveloperTrendChart: React.FC<DeveloperTrendChartProps> = ({ stats, loading = false }) => {
     // 1. Get unique developers for the dropdown
     const developers = useMemo(() => 
         Array.from(new Set(stats.map(s => s.developer))).sort(), 
     [stats]);
+
+    if (loading || !stats || stats.length === 0) {
+        return <LoadingSkeleton type="chart" height="400px" />;
+    }
 
     const [selectedDev, setSelectedDev] = useState(developers[0] || "");
 

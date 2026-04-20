@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import HighChartsBarChart, { sections } from '../components/burnupChart/HighChartsBarChart';
 import { useDevOpsContext } from '../context/DevOpsProvider';
 import Selector from '../components/Selector';
@@ -7,10 +7,13 @@ import DeveloperPerformanceGrid from '../components/DeveloperPerformanceGrid'; /
 import DeveloperBarChart from '../components/burnupChart/DeveloperBarChart'; // Added this import
 import DeveloperTrendChart from '../components/burnupChart/DeveloperTrendChart';
 import SingleDeveloperBarChart from '../components/burnupChart/SingleDeveloperBarChart';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const DashboardPage: React.FC = () => {
     const {
         data, 
+        loading,
         projects, 
         selectedProject, setSelectedProject, 
         teams, 
@@ -23,9 +26,24 @@ const DashboardPage: React.FC = () => {
     const [activeSection, setActiveSection] = useState<string>('feature');
     const [activeView, setActiveView] = useState<string>('Project'); 
     const currentSection = sections.find(s => s.key === activeSection);
+    const [selectedDev, setSelectedDev] = useState<string>('');
+
+    const developers = useMemo(() => {
+        if (!data?.all?.developerStats) return [];
+        return Array.from(new Set(data.all.developerStats.map(s => s.developer))).sort();
+    }, [data]);
+
+    // Set initial developer when data loads
+    useEffect(() => {
+        if (developers.length > 0 && !selectedDev) {
+            setSelectedDev(developers[0]);
+        }
+    }, [developers, selectedDev]);
 
     return (
         <div className="dashboard-container">
+            <LoadingOverlay isLoading={loading && !data} message="Fetching data..." />
+            
             <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1>Dashboard Page</h1>
             </div>
@@ -36,6 +54,7 @@ const DashboardPage: React.FC = () => {
                     options={projects}
                     setValue={setSelectedProject}
                     title="Project"
+                    loading={loading}
                 />
 
                 {selectedProject && (
@@ -44,25 +63,9 @@ const DashboardPage: React.FC = () => {
                         options={teams}
                         setValue={setSelectedTeam}
                         title="Team"
+                        loading={loading}
                     />
                 )}
-
-                <div className="work-type-toggle-container" style={{ display: 'flex', gap: '10px' }}>
-                    <button 
-                        style={{ backgroundColor: workType === 'story' ? '#a5b4fc' : '', border: workType === 'story' ? '2px solid #6366f1' : '' }}
-                        className={`toggle-btn ${workType === 'story' ? 'active' : ''}`}
-                        onClick={() => setWorkType('story')}
-                    >
-                        User Stories
-                    </button>
-                    <button 
-                        style={{ backgroundColor: workType === 'task' ? '#a5b4fc' : '', border: workType === 'task' ? '2px solid #6366f1' : '' }}
-                        className={`toggle-btn ${workType === 'task' ? 'active' : ''}`}
-                        onClick={() => setWorkType('task')}
-                    >
-                        Tasks
-                    </button>
-                </div>
 
                 <div className="view-level-container">
                     <button 
@@ -75,7 +78,7 @@ const DashboardPage: React.FC = () => {
                     <button 
                         className={`view-btn ${activeView === 'Developer' ? 'active' : ''}`} 
                         style={{backgroundColor : activeView === 'Developer' ? '#a5b4fc' : '', border: activeView === 'Developer' ? '2px solid #6366f1' : ''}}
-                        onClick={() => setActiveView('Developer')}
+                        onClick={() => {setActiveView('Developer');setWorkType('task');}} // Force 'Tasks' when switching to Developer View
                     >
                         Developer View
                     </button>
@@ -99,9 +102,7 @@ const DashboardPage: React.FC = () => {
                             value={timeFrame === null ? "null" : timeFrame}
                         >
                             <option value="null">sprint-wise</option>
-                            <option value="monthly">monthly</option>
                             <option value="quarterly">quarterly</option>
-                            <option value="yearly">yearly</option>
                         </select>
                     </div>
                 </div>
@@ -109,41 +110,40 @@ const DashboardPage: React.FC = () => {
 
             {data ? (
                 <div className="chart-container">
-                    <HighChartsBarChart 
-                        key={`${workType}-${timeFrame}`} 
-                        data={data} 
-                        workType={workType}
-                    />
+                    {/* --- PROJECT VIEW SECTION --- */}
+                    {activeView === 'Project' && (
+                        <div className="project-view-content">
+                            <div className="work-type-toggle-container" style={{ display: 'flex', gap: '10px' }}>
+                                <button 
+                                    style={{ backgroundColor: workType === 'story' ? '#a5b4fc' : '', border: workType === 'story' ? '2px solid #6366f1' : '' }}
+                                    className={`toggle-btn ${workType === 'story' ? 'active' : ''}`}
+                                    onClick={() => setWorkType('story')}
+                                >
+                                    User Stories
+                                </button>
+                                <button 
+                                    style={{ backgroundColor: workType === 'task' ? '#a5b4fc' : '', border: workType === 'task' ? '2px solid #6366f1' : '' }}
+                                    className={`toggle-btn ${workType === 'task' ? 'active' : ''}`}
+                                    onClick={() => setWorkType('task')}
+                                >
+                                    Tasks
+                                </button>
+                            </div>
+                            {/* Move the Main Project Chart here */}
+                            <HighChartsBarChart 
+                                key={`${workType}-${timeFrame}`} 
+                                data={data} 
+                                workType={workType}
+                            />
 
-                    {/* <div className="tab-container" style={{ marginTop: '20px' }}>
-                        {sections.filter(section => section.key !== 'all').map(section => (
-                            <button
-                                key={section.key}
-                                className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
-                                onClick={() => setActiveSection(section.key)}
-                            >
-                                {section.title}
-                            </button>
-                        ))}
-                    </div> */}
+                            
 
-                    {currentSection && activeView === 'Project' && (
-                        <div className="active-view-container">
-                            {/* <h2 style={{ color: currentSection.barColor, marginBottom: '20px' }}>
-                                {currentSection.title} {workType === 'task' ? 'Tasks' : 'Stories'}
-                            </h2> */}
-
-                            {/* 1. Developer Bar Chart - Visual Distribution */}
-                            {/* {workType === 'task' && data[currentSection.key]?.developerStats && (
-                                <div style={{ marginBottom: '30px' }}>
-                                    <DeveloperBarChart stats={data[currentSection.key].developerStats ?? []} />
-                                </div>
-                            )} */}
-
-                            <div className="tab-container" style={{ marginTop: '20px' }}>
+                            {/* Move the Section Tabs (Feature, Spillage, etc.) here */}
+                            <div className="tab-container" style={{ marginTop: '20px', display: 'flex', gap: '10px'}}>
                                 {sections.filter(section => section.key !== 'all').map(section => (
-                                    <button
+                                    <button 
                                         key={section.key}
+                                        style={{ backgroundColor: activeSection === section.key ? '#a5b4fc' : '', border: activeSection === section.key ? '2px solid #6366f1' : '' }}
                                         className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
                                         onClick={() => setActiveSection(section.key)}
                                     >
@@ -151,41 +151,90 @@ const DashboardPage: React.FC = () => {
                                     </button>
                                 ))}
                             </div>
-                            <h2 style={{ color: currentSection.barColor, marginBottom: '20px' }}>
-                                {currentSection.title} {workType === 'task' ? 'Tasks' : 'Stories'}
-                            </h2>
 
-                            {/* 2. Impacted Features Card - First in stack */}
-                            <div style={{ marginBottom: '30px' }}>
-                                <ImpactedFeaturesCard 
-                                    features={data[currentSection.key]?.history || []} 
-                                />
-                            </div>
+                            {/* Impacted Features List for the specific section */}
+                            {currentSection && data && data[currentSection.key] && (
+                                <div className="active-view-container">
+                                    <h2 style={{ color: currentSection.barColor, marginBottom: '20px' }}>
+                                        {currentSection.title} {workType === 'task' ? 'Tasks' : 'Stories'}
+                                    </h2>
+                                    {(data[currentSection.key] as any)?.developerStats && (data[currentSection.key] as any)?.developerStats.length > 0 ? 
+                                        <DeveloperBarChart loading={loading} stats={(data[currentSection.key] as any).developerStats || []} /> 
+                                        : <></>
+                                    }
 
-                            {/* {workType === 'task' && data['all']?.developerStats && (
-                                <div style={{ marginBottom: '30px' }}>
-                                    <DeveloperBarChart stats={data['all'].developerStats} />
+                                    <div style={{ marginBottom: '30px' }}>
+                                        <ImpactedFeaturesCard 
+                                            loading={loading}
+                                            features={(data[currentSection.key] as any)?.history || []} 
+                                        />
+                                    </div>
                                 </div>
-                            )} */}
+                            )}
                         </div>
                     )}
 
-                    {currentSection && activeView === 'Developer' && workType === 'task' && data['all']?.developerStats && (
+                    {/* --- DEVELOPER VIEW SECTION --- */}
+                    {activeView === 'Developer' && (
                         <div className="active-dev-container">
-                            <div style={{ marginBottom: '30px' }}>
-                                    <DeveloperBarChart stats={data['all'].developerStats} />
-                                    {/* <DeveloperTrendChart stats={data['all'].developerStats} /> */}
-                                    <SingleDeveloperBarChart stats={data['all'].developerStats} />
-                            </div>
+                            {data['all']?.developerStats ? (
+                                <>
+                                    {/* Move the Section Tabs (Feature, Spillage, etc.) here */}
+                                    <div className="tab-container" style={{ marginTop: '20px', display: 'flex', gap: '10px'}}>
+                                        {sections.map(section => (
+                                            <button 
+                                                key={section.key}
+                                                style={{ backgroundColor: activeSection === section.key ? '#a5b4fc' : '', border: activeSection === section.key ? '2px solid #6366f1' : '' }}
+                                                className={`tab-button ${activeSection === section.key ? 'active' : ''}`}
+                                                onClick={() => setActiveSection(section.key)}
+                                            >
+                                                {section.title}
+                                            </button>
+                                        ))}
+                                    </div>
 
-                            <div style={{ marginBottom: '30px' }}>
-                                    <DeveloperPerformanceGrid 
-                                        stats={data[currentSection.key]?.developerStats || []} 
-                                    />
-                            </div>
+                                    <br />
+
+                                    {/* GLOBAL DEVELOPER SELECTOR */}
+                                    <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <label style={{ fontWeight: 600 }}>Filter by Developer:</label>
+                                        <select
+                                            className="select-dropdown"
+                                            style={{ width: 'auto', minWidth: '250px' }}
+                                            value={selectedDev}
+                                            onChange={(e) => setSelectedDev(e.target.value)}
+                                        >
+                                            {developers.map(dev => (
+                                                <option key={dev} value={dev}>{dev}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div style={{ marginBottom: '30px' }}>
+                                        <SingleDeveloperBarChart 
+                                            loading={loading}
+                                            stats={data[currentSection?.key || 'all']?.developerStats || []} 
+                                            selectedDev={selectedDev} // Pass state as prop
+                                        />
+                                    </div>
+
+                                    <div style={{ marginBottom: '30px' }}>
+                                        <DeveloperPerformanceGrid 
+                                            loading={loading}
+                                            stats={data[currentSection?.key || 'all']?.developerStats || []} 
+                                            selectedDev={selectedDev} // Pass state as prop
+                                            fullData={data}
+                                        />
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="empty-state">
+                                    <p>Developer stats are only available for "Tasks" work type.</p>
+                                </div>
+                            )}
                         </div>
                     )}
-                </div> /* Closed chart-container */
+                </div> 
             ) : (
                 <div className="empty-state" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
                     <p>Please select a project and team to load {workType === 'task' ? 'task' : 'story'} data.</p>

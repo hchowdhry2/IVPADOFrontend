@@ -10,12 +10,39 @@ interface SelectorProps {
   setValue: (value: string | null) => void;
   title: string;
   value: string | null;
+  loading?: boolean;
 }
 
-const Selector: React.FC<SelectorProps> = ({ options, setValue, title, value }) => {
+const Selector: React.FC<SelectorProps> = ({ options, setValue, title, value, loading = false }) => {
+
+  if (loading) {
+    return (
+      <div className="filter-group">
+        <h3>Select {title}:</h3>
+        <select 
+          className="select-dropdown" 
+          disabled
+          style={{ opacity: 0.6, cursor: 'not-allowed' }}
+        >
+          <option value="">Loading {title}...</option>
+        </select>
+      </div>
+    );
+  }
 
   if (!options || options.length === 0) {
-    return <p>Loading {title}...</p>;
+    return (
+      <div className="filter-group">
+        <h3>Select {title}:</h3>
+        <select 
+          className="select-dropdown" 
+          disabled
+          style={{ opacity: 0.6, cursor: 'not-allowed' }}
+        >
+          <option value="">No {title} available</option>
+        </select>
+      </div>
+    );
   }
 
   return (

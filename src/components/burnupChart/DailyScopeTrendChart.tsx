@@ -2,12 +2,14 @@ import React from 'react';
 import * as Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { SprintTrend } from '../../services/fetchService';
+import LoadingSkeleton from '../LoadingSkeleton';
 
 // 1. Define Props Interface
 interface DailyScopeTrendChartProps {
   title: string;
   dailyTrends: SprintTrend[];
   workType: 'story' | 'task';
+  loading?: boolean;
 }
 
 // 2. Define an interface for our custom point properties 
@@ -18,8 +20,10 @@ interface ExtendedPoint extends Highcharts.Point {
   displayDay?: string;
 }
 
-const DailyScopeTrendChart: React.FC<DailyScopeTrendChartProps> = ({ title, dailyTrends, workType }) => {
-  if (!dailyTrends || dailyTrends.length === 0) return null;
+const DailyScopeTrendChart: React.FC<DailyScopeTrendChartProps> = ({ title, dailyTrends, workType, loading = false }) => {
+  if (loading || !dailyTrends || dailyTrends.length === 0) {
+    return <LoadingSkeleton type="chart" height="300px" />;
+  }
 
   const isTask = workType === 'task';
 

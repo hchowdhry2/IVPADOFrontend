@@ -4,6 +4,7 @@ import RenderLineChart from './RenderLineChart';
 import DailyScopeTrendChart from './DailyScopeTrendChart';
 import { useDevOpsContext } from '../../context/DevOpsProvider';
 import { SpillageDataResponse } from '../../services/fetchService';
+import LoadingSkeleton from '../LoadingSkeleton';
 
 // 1. Define the Section interface
 export interface Section {
@@ -32,7 +33,17 @@ const HighChartsBarChart: React.FC<HighChartsBarChartProps> = ({ data }) => {
   const unitLabel = workType === 'task' ? 'Count' : 'Points';
 
   if (loading || !data) {
-    return <div style={{ textAlign: 'center', padding: '50px' }}>Loading Dashboard Data...</div>;
+    return (
+      <div className="dashboard-wrapper">
+        <LoadingSkeleton type="chart" height="400px" />
+        {sections.map((section) => (
+          <div key={section.key} className="section-container" style={{ marginBottom: '60px' }}>
+            <LoadingSkeleton type="chart" height="350px" />
+            <LoadingSkeleton type="chart" height="300px" />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (

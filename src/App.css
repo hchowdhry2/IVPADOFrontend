@@ -139,12 +139,11 @@
   color: #1e293b;
   margin: 20px auto;
   padding: 0 20px;
-  height : 50vh;
+  height : 90vh;
   overflow: scroll;
 }
 
 .section-header {
-  margin-bottom: 24px;
   border-left: 4px solid #6366f1;
   padding-left: 16px;
 }
