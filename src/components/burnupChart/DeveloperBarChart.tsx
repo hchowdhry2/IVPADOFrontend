@@ -2,13 +2,19 @@ import React, { useMemo } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { DeveloperStat } from '../../services/fetchService';
+import LoadingSkeleton from '../LoadingSkeleton';
 
 interface DeveloperBarChartProps {
     stats: DeveloperStat[];
+    loading?: boolean;
 }
 
-const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats }) => {
+const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats, loading = false }) => {
     
+    if (loading || !stats || stats.length === 0) {
+        return <LoadingSkeleton type="chart" height="500px" />;
+    }
+
     const { categories, seriesData, plotBands, plotLines } = useMemo(() => {
         // 1. Get unique sprints sorted
         // const sprints = Array.from(new Set(stats.map(s => s.sprint))).sort();

@@ -3,6 +3,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { SpillageDataResponse } from '../../services/fetchService';
 import { Section } from './HighChartsBarChart'; // Import the interface we made earlier
+import LoadingSkeleton from '../LoadingSkeleton';
 
 // 1. Define the Props Interface
 interface RenderLineChartProps {
@@ -10,9 +11,14 @@ interface RenderLineChartProps {
   data: SpillageDataResponse;
   sections: Section[];
   workType: 'story' | 'task';
+  loading?: boolean;
 }
 
-const RenderLineChart: React.FC<RenderLineChartProps> = ({ title, data, sections, workType }) => {
+const RenderLineChart: React.FC<RenderLineChartProps> = ({ title, data, sections, workType, loading = false }) => {
+  if (loading) {
+    return <LoadingSkeleton type="chart" height="400px" />;
+  }
+
   const isTask = workType === 'task';
 
   // 2. Get categories from the 'all' section to define the X-Axis

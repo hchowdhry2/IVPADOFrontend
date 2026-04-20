@@ -1,12 +1,14 @@
 import React, { useMemo } from 'react';
 import { HistoryItem } from '../services/fetchService';
+import LoadingSkeleton from './LoadingSkeleton';
 
 // 1. Define the Props interface
 interface ImpactedFeaturesCardProps {
   features: HistoryItem[];
+  loading?: boolean;
 }
 
-const ImpactedFeaturesCard: React.FC<ImpactedFeaturesCardProps> = ({ features }) => {
+const ImpactedFeaturesCard: React.FC<ImpactedFeaturesCardProps> = ({ features, loading = false }) => {
   
   // Performance: Sort by the new Total Impact Score (Churn)
   const sortedFeatures = useMemo(() => {
@@ -16,6 +18,10 @@ const ImpactedFeaturesCard: React.FC<ImpactedFeaturesCardProps> = ({ features })
       (b.totalImpactScore || 0) - (a.totalImpactScore || 0)
     );
   }, [features]);
+
+  if (loading) {
+    return <LoadingSkeleton type="grid" count={3} />;
+  }
 
   // Aesthetic Logic: Color based on "Friction"
   const getImpactColor = (score: number, count: number): string => {
