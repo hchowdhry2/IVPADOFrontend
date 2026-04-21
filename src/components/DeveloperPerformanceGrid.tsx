@@ -3,6 +3,7 @@ import { aggregateStats, DeveloperStat, normalize } from '../utils/statsHelper';
 import SprintDoughnutChart from './burnupChart/SprintDoughnutChart';
 import LoadingSkeleton from './LoadingSkeleton';
 import VisualizationInfoDialog from './VisualizationInfoDialog';
+import ActivityDoughnutChart from './burnupChart/ActivityDoughnutChart';
 
 interface DeveloperPerformanceGridProps {
   stats: DeveloperStat[];
@@ -86,6 +87,17 @@ const DeveloperPerformanceGrid: React.FC<DeveloperPerformanceGridProps> = ({ sta
             const clientSprint = fullData.client.developerStats.find(
                 (s: any) => normalize(s.sprint) === targetKey && s.developer === selectedDev
             );
+
+            // 1. Find the activity record that matches BOTH the selected developer AND the current sprint
+            const activityRecord = fullData.all.developerActivityStats.find((s: any) => {
+                // split "Aryan Mahesh Verma<amverma@ivp.in>|IVP-EDM\R..." 
+                const [devName, sprintPath] = s.periodLabel.split('|'); 
+                return devName === selectedDev && normalize(sprintPath) === targetKey;
+            });
+
+            // 2. Get the array of activities (Dev, PR, etc.) or an empty list if none found
+            const activities = activityRecord?.activities || [];
+
             return(
                 <div key={sprintName} className="sprint-group" style={{ marginBottom: '20px' }}>
 
@@ -142,8 +154,68 @@ const DeveloperPerformanceGrid: React.FC<DeveloperPerformanceGridProps> = ({ sta
                             clientCount={clientSprint?.totalTasksAssigned || 0}
                             type="Assigned"
                         />
+                    </div> */}
+                    {/* Container for horizontal scrolling if there are many sprints */}
+<div className="horizontal-sprint-container" style={{ display: 'flex', gap: '15px', overflowX: 'auto', paddingBottom: '20px' }}>
+  
+  {sortedSprintNames.map((sprintName) => {
+    const targetKey = normalize(sprintName);
+
+    // Get your Activity Data
+    const activityRecord = fullData.all.developerActivityStats.find((s: any) => {
+        const [devName, sprintPath] = s.periodLabel.split('|'); 
+        return devName === selectedDev && normalize(sprintPath) === targetKey;
+    });
+    const activities = activityRecord?.activities || [];
+
+    // Get your Feature/Client Data
+    const featSprint = fullData.feature.developerStats.find(
+        (s: any) => normalize(s.sprint) === targetKey && s.developer === selectedDev
+    );
+    const clientSprint = fullData.client.developerStats.find(
+        (s: any) => normalize(s.sprint) === targetKey && s.developer === selectedDev
+    );
+
+    return (
+      <div key={sprintName} style={{ minWidth: '350px', flex: '0 0 auto', background: '#fff', borderRadius: '12px', padding: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+        
+        {/* Sprint Header (Matches your bar chart x-axis labels) */}
+        <div style={{ textAlign: 'center', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+            <span style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block' }}>{sprintName}</span>
+            <small style={{ color: '#666' }}>{featSprint?.totalTasksCompleted + clientSprint?.totalTasksCompleted || 0} Tasks Completed</small>
+        </div>
+
+        {/* Charts side-by-side within the sprint card */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            
+            <div style={{ borderBottom: '1px dashed #eee' }}>
+                <p style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: '#444', margin: '0' }}>Feature vs Client</p>
+                <SprintDoughnutChart 
+                    sprintName={sprintName}
+                    featureCount={featSprint?.totalTasksCompleted || 0}
+                    clientCount={clientSprint?.totalTasksCompleted || 0}
+                    type="Completed"
+                />
+            </div>
+
+            <div>
+                <p style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: '#444', margin: '0' }}>Activity Types</p>
+                {activities.length > 0 ? (
+                    <ActivityDoughnutChart activities={activities} />
+                ) : (
+                    <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc', fontSize: '0.8rem' }}>
+                        No data
                     </div>
-                    <div style={{ flex: 1 }}>
+                )}
+            </div>
+            
+        </div>
+      </div>
+    );
+  })}
+{/* </div> */}
+                    {/* </div> */}
+                    {/* <div style={{ flex: 1 }}>
                         <p style={{ textAlign: 'center', fontSize: '0.8rem', fontWeight: 600 }}>Work Distribution (Completed)</p>
                         <SprintDoughnutChart 
                             sprintName={sprintName}
@@ -151,8 +223,8 @@ const DeveloperPerformanceGrid: React.FC<DeveloperPerformanceGridProps> = ({ sta
                             clientCount={clientSprint?.totalTasksCompleted || 0}
                             type="Completed"
                         />
-                    </div>
                     </div> */}
+                    </div>
                 </div>
 
                 

@@ -9,6 +9,7 @@ import DeveloperTrendChart from '../components/burnupChart/DeveloperTrendChart';
 import SingleDeveloperBarChart from '../components/burnupChart/SingleDeveloperBarChart';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import LoadingOverlay from '../components/LoadingOverlay';
+import ActivityDistributionRow from '../components/burnupChart/ActivityDistributionRow';
 
 const DashboardPage: React.FC = () => {
     const {
@@ -235,12 +236,20 @@ const DashboardPage: React.FC = () => {
                                         />
                                     </div>
 
-                                    <div style={{ marginBottom: '30px' }}>
+                                    {/* <div style={{ marginBottom: '30px' }}>
                                         <DeveloperPerformanceGrid 
                                             loading={loading}
                                             stats={data[currentSection?.key || 'all']?.developerStats || []} 
                                             selectedDev={selectedDev} // Pass state as prop
                                             fullData={data}
+                                        />
+                                    </div> */}
+                                    <div>
+                                        <ActivityDistributionRow
+                                            data={data}                  // The whole data object
+                                            selectedDev={selectedDev}    // Current dev string
+                                            activeSection={activeSection} // 'feature', 'client', or 'all'
+                                            sprintNames={allSprints}     // The array of sprint strings
                                         />
                                     </div>
                                 </>
