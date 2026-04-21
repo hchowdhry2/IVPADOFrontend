@@ -33,6 +33,14 @@ const DashboardPage: React.FC = () => {
         return Array.from(new Set(data.all.developerStats.map(s => s.developer))).sort();
     }, [data]);
 
+    const allSprints = useMemo(() => {
+        if (!data?.all?.developerStats) return [];
+        // Collect all sprint keys from developerStats to form the master list
+        const sectionData = data[currentSection?.key || 'all']?.developerStats || [];
+        const sprints = new Set(sectionData.map(s => s.sprint));
+        return Array.from(sprints);
+    }, [data, currentSection]);
+
     // Set initial developer when data loads
     useEffect(() => {
         if (developers.length > 0 && !selectedDev) {
@@ -210,11 +218,20 @@ const DashboardPage: React.FC = () => {
                                         </select>
                                     </div>
 
-                                    <div style={{ marginBottom: '30px' }}>
+                                    <div style={{ marginBottom: '30px'}}>
                                         <SingleDeveloperBarChart 
                                             loading={loading}
                                             stats={data[currentSection?.key || 'all']?.developerStats || []} 
                                             selectedDev={selectedDev} // Pass state as prop
+                                            variant="tasks"
+                                            allSprints={allSprints} // Pass all sprints
+                                        />
+                                        <SingleDeveloperBarChart 
+                                            loading={loading}
+                                            stats={data[currentSection?.key || 'all']?.effortVariance || []} 
+                                            selectedDev={selectedDev} // Pass state as prop
+                                            variant="effort"
+                                            allSprints={allSprints} // Pass all sprints for effort variance calculation
                                         />
                                     </div>
 

@@ -1,74 +1,86 @@
 import React, { useMemo } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import { aggregateStats, DeveloperStat, normalize } from '../../utils/statsHelper';
+import { aggregateStats, DeveloperStat, EffortVariance, normalize } from '../../utils/statsHelper';
 import LoadingSkeleton from '../LoadingSkeleton';
+import VisualizationInfoDialog from '../VisualizationInfoDialog';
 
 interface Props {
-  stats: DeveloperStat[];
+  stats: DeveloperStat[] | EffortVariance[];
   selectedDev: string;
   loading?: boolean;
+  variant: 'tasks' | 'effort';
+  allSprints: string[]; // List of all sprints for consistent x-axis
 }
 
-const SingleDeveloperBarChart: React.FC<Props> = ({ stats, selectedDev, loading = false }) => {
+const SingleDeveloperBarChart: React.FC<Props> = ({ stats, selectedDev, loading = false, variant, allSprints }) => {
   if (loading || !stats || stats.length === 0) {
     return <LoadingSkeleton type="chart" height="450px" />;
   }
 
-  const aggregatedStats = useMemo(() => aggregateStats(stats), [stats]);
-
   const chartOptions = useMemo(() => {
-    // 1. Filter and Sort
-    const devStats = aggregatedStats.filter(s => s.developer === selectedDev);
-    
-    const sorted = [...devStats].sort(
-      (a, b) => new Date(a.sprintStartDate || 0).getTime() - new Date(b.sprintStartDate || 0).getTime()
-    );
+  const isEffort = variant === 'effort';
+  const filtered = stats.filter(s => s.developer === selectedDev);
 
-    // 2. Prepare Data
-    const categories = sorted.map(s => normalize(s.sprint)).reverse();
-    const completed = sorted.map(s => s.totalTasksCompleted).reverse();
-    
-    // Calculate the remaining (uncompleted) portion to stack on top/below
-    const uncompleted = sorted.map(s => Math.max(0, s.totalTasksAssigned - s.totalTasksCompleted)).reverse();
+  // 1. Ensure we have the master list of sprints from props
+  // We normalize them so lookup keys match
+  const masterSprintList = allSprints; 
 
-    return {
-      chart: { type: 'column', height: 450 },
-      title: { text: `Sprint Progress: ${selectedDev}` },
-      xAxis: { 
-        categories,
-        labels: { rotation: 0 }
-      },
-      yAxis: { 
-        min: 0, 
-        title: { text: 'Tasks' },
-        stackLabels: { enabled: true } // Shows the total (Assigned) count on top of the bar
-      },
-      plotOptions: {
-        column: {
-          stacking: 'normal', // This forces the "one column" effect
-          borderRadius: 4,
-          dataLabels: { enabled: false }
-        }
-      },
-      series: [
-        { 
-          name: 'Tasks Remaining', 
-          data: uncompleted, 
-          color: '#a5b4fc' // Light Purple
-        },
-        { 
-          name: 'Tasks Completed', 
-          data: completed, 
-          color: '#22c55e' // Green
-        }
-      ],
-      credits: { enabled: false }
-    };
-  }, [aggregatedStats, selectedDev]);
+  const categories = masterSprintList.map(s => normalize(s));
+
+  let seriesData = [];
+
+  if (isEffort) {
+      const typedStats = filtered as EffortVariance[];
+      return {
+        chart: { type: 'column', height: 450 },
+        title: { text: `Effort Variance: ${selectedDev}` },
+        xAxis: { categories, labels: { rotation: 0 } },
+        yAxis: { min: 0, title: { text: 'Hours' } },
+        // ENABLE dataLabels for Effort
+        plotOptions: { column: { borderRadius: 4, dataLabels: { enabled: true } } },
+        series: [
+          { name: 'Committed', data: masterSprintList.map(s => typedStats.find(t => normalize(t.sprint) === normalize(s))?.committedEffort || 0), color: '#a5b4fc' },
+          { name: 'Actual', data: masterSprintList.map(s => typedStats.find(t => normalize(t.sprint) === normalize(s))?.actualEffort || 0), color: '#22c55e' }
+        ],
+        credits: { enabled: false }
+      };
+    } else {
+      const aggStats = aggregateStats(filtered as DeveloperStat[]);
+      return {
+        chart: { type: 'column', height: 450 },
+        title: { text: `Sprint Progress: ${selectedDev}` },
+        xAxis: { categories, labels: { rotation: 0 } },
+        // ENABLE stackLabels (the total on top) for Tasks
+        yAxis: { min: 0, title: { text: 'Tasks' }, stackLabels: { enabled: true } },
+        // DISABLE dataLabels (inside segments) for Tasks
+        plotOptions: { column: { stacking: 'normal', borderRadius: 4, dataLabels: { enabled: false } } },
+        series: [
+          { 
+            name: 'Tasks Remaining', 
+            data: masterSprintList.map(s => {
+              const item = aggStats.find(a => normalize(a.sprint) === normalize(s));
+              return item ? Math.max(0, item.totalTasksAssigned - item.totalTasksCompleted) : 0;
+            }), 
+            color: '#a5b4fc' 
+          },
+          { 
+            name: 'Tasks Completed', 
+            data: masterSprintList.map(s => aggStats.find(a => normalize(a.sprint) === normalize(s))?.totalTasksCompleted || 0), 
+            color: '#22c55e' 
+          }
+        ],
+        credits: { enabled: false }
+      };
+    }
+  }, [stats, selectedDev, variant, allSprints]);
 
   return (
     <div style={{ padding: '20px', background: '#fff', borderRadius: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}></h3>
+        <VisualizationInfoDialog visualizationKey={variant === 'effort' ? 'effortVariance' : 'sprintProgressDev'} title={variant === 'effort' ? 'Effort Variance Logic' : 'Sprint Progress Logic'} />
+      </div>
       <HighchartsReact highcharts={Highcharts} options={chartOptions} />
     </div>
   );

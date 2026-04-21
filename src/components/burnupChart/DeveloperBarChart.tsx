@@ -3,6 +3,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { DeveloperStat } from '../../services/fetchService';
 import LoadingSkeleton from '../LoadingSkeleton';
+import VisualizationInfoDialog from '../VisualizationInfoDialog';
 
 interface DeveloperBarChartProps {
     stats: DeveloperStat[];
@@ -146,9 +147,13 @@ const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats, loading = 
     };
 
     return (
-        <div className="dashboard-section modern-theme" style={{ padding: '30px 20px 20px 20px', background: '#fff', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <HighchartsReact highcharts={Highcharts} options={options} />
-        </div>
+        <div className="dashboard-section" style={{ padding: '30px 20px 20px 20px', background: '#fff', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}></h3>
+                    <VisualizationInfoDialog visualizationKey="sprintProgressDev" title="Sprint Progress Logic" />
+                </div>
+                <HighchartsReact highcharts={Highcharts} options={options} />
+            </div>
     );
 };
 

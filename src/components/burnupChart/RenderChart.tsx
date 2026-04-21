@@ -3,6 +3,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { SprintStat } from '../../services/fetchService';
 import LoadingSkeleton from '../LoadingSkeleton';
+import VisualizationInfoDialog from '../VisualizationInfoDialog';
 
 // 1. Define the Props Interface
 interface RenderChartProps {
@@ -33,7 +34,6 @@ const RenderChart: React.FC<RenderChartProps> = ({ title, statsArray, barColor, 
     }
     return 0;
   };
-
   const sprintNames = statsArray.map(item => 
     item.iterationPath?.split('\\').pop() || 'Sprint'
   );
@@ -106,6 +106,10 @@ const RenderChart: React.FC<RenderChartProps> = ({ title, statsArray, barColor, 
 
   return (
     <div style={{ flex: 1, padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}></h3>
+        <VisualizationInfoDialog visualizationKey="stats" title="Sprint Metrics Logic" />
+      </div>
        <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );

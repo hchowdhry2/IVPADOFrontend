@@ -7,6 +7,14 @@ export interface DeveloperStat {
   sprintStartDate?: string | Date;
 }
 
+export interface EffortVariance {
+    actualEffort: number;
+    committedEffort: number;
+    sprint: string;
+    developer: string;
+    sortDate: string | Date;
+}  
+
 export const normalize = (val?: string): string => {
   return val?.toLowerCase().split('\\').pop()?.trim() || '';
 };

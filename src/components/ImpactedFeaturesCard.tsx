@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { HistoryItem } from '../services/fetchService';
 import LoadingSkeleton from './LoadingSkeleton';
+import VisualizationInfoDialog from './VisualizationInfoDialog';
 
 // 1. Define the Props interface
 interface ImpactedFeaturesCardProps {
@@ -37,9 +38,12 @@ const ImpactedFeaturesCard: React.FC<ImpactedFeaturesCardProps> = ({ features, l
 
   return (
     <div className="dashboard-section modern-theme">
-      <div className="section-header">
-        <h3>Parent Impact Analysis ({sortedFeatures.length})</h3>
-        <p className="subtitle">Ranking by total delivery friction (iteration transitions)</p>
+      <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+        <div>
+          <h3>Parent Impact Analysis ({sortedFeatures.length})</h3>
+          <p className="subtitle">Ranking by total delivery friction (iteration transitions)</p>
+        </div>
+        <VisualizationInfoDialog visualizationKey="impactGrid" title="Impact Grid Logic" />
       </div>
 
       <div className="feature-list">

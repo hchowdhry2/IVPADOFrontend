@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import LoadingSkeleton from '../LoadingSkeleton';
+import VisualizationInfoDialog from '../VisualizationInfoDialog';
 
 interface Stat {
     sprint: string;
@@ -87,15 +88,18 @@ const DeveloperTrendChart: React.FC<DeveloperTrendChartProps> = ({ stats, loadin
 
     return (
         <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <label style={{ fontWeight: '600', color: '#475569' }}>Select Developer:</label>
-                <select 
-                    value={selectedDev} 
-                    onChange={(e) => setSelectedDev(e.target.value)}
-                    style={{ padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', minWidth: '200px' }}
-                >
-                    {developers.map(dev => <option key={dev} value={dev}>{dev}</option>)}
-                </select>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontWeight: '600', color: '#475569' }}>Select Developer:</label>
+                    <select 
+                        value={selectedDev} 
+                        onChange={(e) => setSelectedDev(e.target.value)}
+                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', minWidth: '200px' }}
+                    >
+                        {developers.map(dev => <option key={dev} value={dev}>{dev}</option>)}
+                    </select>
+                </div>
+                <VisualizationInfoDialog visualizationKey="sprintProgressDev" title="Developer Trend Logic" />
             </div>
             <HighchartsReact highcharts={Highcharts} options={options} />
         </div>
