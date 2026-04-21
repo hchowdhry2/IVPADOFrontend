@@ -3,6 +3,7 @@ import * as Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { SprintTrend } from '../../services/fetchService';
 import LoadingSkeleton from '../LoadingSkeleton';
+import VisualizationInfoDialog from '../VisualizationInfoDialog';
 
 // 1. Define Props Interface
 interface DailyScopeTrendChartProps {
@@ -107,6 +108,10 @@ const DailyScopeTrendChart: React.FC<DailyScopeTrendChartProps> = ({ title, dail
 
   return (
     <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}></h3>
+        <VisualizationInfoDialog visualizationKey="dailyScope" title="Daily Scope Logic" />
+      </div>
       <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );

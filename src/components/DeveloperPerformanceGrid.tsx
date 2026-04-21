@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { aggregateStats, DeveloperStat, normalize } from '../utils/statsHelper';
 import SprintDoughnutChart from './burnupChart/SprintDoughnutChart';
 import LoadingSkeleton from './LoadingSkeleton';
+import VisualizationInfoDialog from './VisualizationInfoDialog';
 
 interface DeveloperPerformanceGridProps {
   stats: DeveloperStat[];
@@ -46,13 +47,15 @@ const DeveloperPerformanceGrid: React.FC<DeveloperPerformanceGridProps> = ({ sta
 
   return (
     <div className="dashboard-section modern-theme">
-      
-      {/* 🔥 YOUR ORIGINAL HEADER CSS KEPT */}
-      <div className="section-header">
-        <h3>Developer Performance by Sprint</h3>
-        <p className="subtitle">Individual contributions per iteration</p>
+      <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+        <div>
+          <h3>Developer Performance by Sprint</h3>
+          <p className="subtitle">Individual contributions per iteration</p>
+        </div>
+        <VisualizationInfoDialog visualizationKey="sprintProgressDev" title="Developer Performance Logic" />
       </div>
 
+      {/* 🔥 YOUR ORIGINAL HEADER CSS KEPT */}
       <div className="grouped-list-container">
         {/* 🔥 STICKY HEADER (UNCHANGED CSS) */}
         <div className="sticky-sprint-header" style={{
@@ -83,7 +86,6 @@ const DeveloperPerformanceGrid: React.FC<DeveloperPerformanceGridProps> = ({ sta
             const clientSprint = fullData.client.developerStats.find(
                 (s: any) => normalize(s.sprint) === targetKey && s.developer === selectedDev
             );
-            console.log(featSprint, clientSprint);
             return(
                 <div key={sprintName} className="sprint-group" style={{ marginBottom: '20px' }}>
 

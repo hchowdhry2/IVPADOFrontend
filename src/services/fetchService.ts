@@ -1,4 +1,5 @@
 import { apiConfig, apiConfigDevops } from "./apiConfig";
+import { EffortVariance } from '../utils/statsHelper';
 
 // --- 1. DATA MODELS (Interfaces) ---
 
@@ -64,6 +65,7 @@ export interface SpillageCategory {
     history: HistoryItem[];
     dailyTrends?: SprintTrend[]; // optional
     developerStats?: DeveloperStat[]; // optional, will always be there in task data but not in story data
+    effortVariance?: EffortVariance[];
 }
 
 // The root response is a dictionary (e.g., "all", "Feature", "Client")

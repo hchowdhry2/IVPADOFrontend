@@ -4,6 +4,7 @@ import HighchartsReact from 'highcharts-react-official';
 import { SpillageDataResponse } from '../../services/fetchService';
 import { Section } from './HighChartsBarChart'; // Import the interface we made earlier
 import LoadingSkeleton from '../LoadingSkeleton';
+import VisualizationInfoDialog from '../VisualizationInfoDialog';
 
 // 1. Define the Props Interface
 interface RenderLineChartProps {
@@ -63,6 +64,10 @@ const RenderLineChart: React.FC<RenderLineChartProps> = ({ title, data, sections
 
   return (
     <div style={{ flex: 1, padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginTop: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}></h3>
+        <VisualizationInfoDialog visualizationKey="spillage" title="Spillage Logic" />
+      </div>
       <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );
