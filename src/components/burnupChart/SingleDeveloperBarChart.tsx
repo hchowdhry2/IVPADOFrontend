@@ -22,9 +22,21 @@ const SingleDeveloperBarChart: React.FC<Props> = ({ stats, selectedDev, loading 
   const isEffort = variant === 'effort';
   const filtered = stats.filter(s => s.developer === selectedDev);
 
-  // 1. Ensure we have the master list of sprints from props
-  // We normalize them so lookup keys match
-  const masterSprintList = allSprints; 
+  const sprintDateMap = new Map();
+  stats.forEach(s => {
+    // Both DeveloperSprintStatDto (tasks) and EffortVarianceDto have a date field
+    const date = (s as any).sprintStartDate || (s as any).sortDate;
+    if (date) {
+      sprintDateMap.set(s.sprint, new Date(date).getTime());
+    }
+  });
+
+  // 2. Sort the master list chronologically (Oldest -> Newest)
+  const masterSprintList = [...allSprints].sort((a, b) => {
+    const dateA = sprintDateMap.get(a) || 0;
+    const dateB = sprintDateMap.get(b) || 0;
+    return dateA - dateB;
+  });
 
   const categories = masterSprintList.map(s => normalize(s));
 
