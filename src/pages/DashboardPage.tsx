@@ -168,7 +168,16 @@ const DashboardPage: React.FC = () => {
                                         {currentSection.title} {workType === 'task' ? 'Tasks' : 'Stories'}
                                     </h2>
                                     {(data[currentSection.key] as any)?.developerStats && (data[currentSection.key] as any)?.developerStats.length > 0 ? 
-                                        <DeveloperBarChart loading={loading} stats={(data[currentSection.key] as any).developerStats || []} /> 
+                                        <>
+                                            <DeveloperBarChart loading={loading} stats={(data[currentSection.key] as any).developerStats || []} /> 
+                                            <SingleDeveloperBarChart 
+                                                loading={loading}
+                                                stats={data[currentSection?.key || 'all']?.effortVariance || []} 
+                                                selectedDev={selectedDev} // Pass state as prop
+                                                variant="effort"
+                                                allSprints={allSprints} // Pass all sprints for effort variance calculation
+                                            />
+                                        </>
                                         : <></>
                                     }
 
@@ -226,13 +235,6 @@ const DashboardPage: React.FC = () => {
                                             selectedDev={selectedDev} // Pass state as prop
                                             variant="tasks"
                                             allSprints={allSprints} // Pass all sprints
-                                        />
-                                        <SingleDeveloperBarChart 
-                                            loading={loading}
-                                            stats={data[currentSection?.key || 'all']?.effortVariance || []} 
-                                            selectedDev={selectedDev} // Pass state as prop
-                                            variant="effort"
-                                            allSprints={allSprints} // Pass all sprints for effort variance calculation
                                         />
                                     </div>
 

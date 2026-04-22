@@ -42,7 +42,7 @@ const ActivityDistributionRow: React.FC<Props> = ({ data, selectedDev, activeSec
           // Inside ActivityDistributionRow.tsx map function
             return (
             <div key={sprintName} style={{ 
-                minWidth: '450px', // Increased from 320px
+                minWidth: '430px', // Increased from 320px
                 flex: '0 0 auto' 
             }}>
                 <p style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '10px' }}>
@@ -52,7 +52,7 @@ const ActivityDistributionRow: React.FC<Props> = ({ data, selectedDev, activeSec
                 <div style={{ 
                     background: '#fff', 
                     borderRadius: '12px', 
-                    padding: '20px', // Increased padding
+                    padding: '10px', // Increased padding
                     border: '1px solid #e2e8f0',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.1)' 
                 }}>

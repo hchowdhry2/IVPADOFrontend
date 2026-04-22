@@ -14,7 +14,7 @@ interface Props {
 
 const ActivityDoughnutChart: React.FC<Props> = ({ activities }) => {
   const chartOptions = useMemo(() => ({
-    chart: { type: 'pie', height: 250, backgroundColor: 'transparent' },
+    chart: { type: 'pie', height: 220, backgroundColor: 'transparent' },
     title: { text: null },
     tooltip: { 
       pointFormat: '<b>{point.name}</b>: {point.completed} out of {point.y} completed' 
