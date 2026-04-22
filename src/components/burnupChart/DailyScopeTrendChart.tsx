@@ -23,7 +23,7 @@ interface ExtendedPoint extends Highcharts.Point {
 
 const DailyScopeTrendChart: React.FC<DailyScopeTrendChartProps> = ({ title, dailyTrends, workType, loading = false }) => {
   if (loading || !dailyTrends || dailyTrends.length === 0) {
-    return <LoadingSkeleton type="chart" height="300px" />;
+    return <></>;
   }
 
   const isTask = workType === 'task';
