@@ -3,8 +3,10 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
 interface EffortBreakdown {
-  attribute: string;
-  totalEffort: number;
+  attribute?: string;
+  Attribute?: string; 
+  totalEffort?: number;
+  TotalEffort?: number; 
 }
 
 interface Props {
@@ -14,61 +16,43 @@ interface Props {
 
 const EffortDonut: React.FC<Props> = ({ data, title }) => {
   const options = useMemo(() => {
-    // 1. AGGREGATION LOGIC: Sum effort by attribute
-    const aggregatedData = data.reduce((acc, curr) => {
-      const existing = acc.find(item => item.name === curr.attribute);
+    // Aggregation logic with debug fallback
+    const aggregatedData = (data || []).reduce((acc, curr) => {
+      // Handle both camelCase and PascalCase from C#
+      const label = (curr.attribute || curr.Attribute || "Not Defined").trim();
+      const value = curr.totalEffort || curr.TotalEffort || 0;
+
+      const existing = acc.find(item => item.name === label);
       if (existing) {
-        existing.y += curr.totalEffort;
+        existing.y += value;
       } else {
-        acc.push({ name: curr.attribute || "Not Defined", y: curr.totalEffort });
+        acc.push({ name: label, y: value });
       }
       return acc;
     }, [] as { name: string; y: number }[]);
 
     return {
-      chart: { 
-        type: 'pie', 
-        height: 250, 
-        backgroundColor: 'transparent',
-        margin: [0, 0, 0, 0]
-      },
-      title: { 
-        text: title, 
-        style: { fontSize: '14px', fontWeight: '600', color: '#334155' }
-      },
-      tooltip: { 
-        pointFormat: '<b>{point.name}</b>: {point.y:.1f} hrs' 
-      },
+      chart: { type: 'pie', height: 250, backgroundColor: 'transparent', margin: [0, 0, 0, 0] },
+      title: { text: title, style: { fontSize: '14px', fontWeight: '600', color: '#334155' } },
+      tooltip: { pointFormat: '<b>{point.name}</b>: {point.y:.1f} hrs' },
       plotOptions: {
         pie: {
           innerSize: '65%',
-          borderWidth: 2,
-          borderColor: '#ffffff',
-          dataLabels: { 
-            enabled: true, 
-            format: '<b>{point.name}</b>: {point.y:.1f}h',
-            style: { fontSize: '10px', color: '#64748b' }
-          }
+          dataLabels: { enabled: true, format: '{point.name}', style: { fontSize: '10px' } }
         }
       },
-      series: [{
-        name: 'Effort',
-        colorByPoint: true,
-        data: aggregatedData // 2. Use the aggregated list
-      }],
+      series: [{ name: 'Effort', colorByPoint: true, data: aggregatedData }],
       credits: { enabled: false }
     };
   }, [data, title]);
 
+  // DIAGNOSTIC: If data exists but chart is empty, log this
+  if (data && data.length > 0 && !options.series[0].data.length) {
+     console.warn("EffortDonut: Data found but aggregation resulted in empty list. Check property names:", data[0]);
+  }
+
   if (!data || data.length === 0) {
-    return (
-      <div style={{ 
-        height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-        color: '#94a3b8', fontSize: '13px', border: '1px dashed #e2e8f0', borderRadius: '12px' 
-      }}>
-        No Data Available
-      </div>
-    );
+    return <div style={{ height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>No Data Available</div>;
   }
 
   return <HighchartsReact highcharts={Highcharts} options={options} />;

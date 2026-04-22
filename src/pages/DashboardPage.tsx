@@ -181,8 +181,8 @@ const DashboardPage: React.FC = () => {
                                                 allSprints={allSprints} // Pass all sprints for effort variance calculation
                                             />
                                             <div style={{ display: 'flex', gap: '20px', marginTop: '30px' }}>
-                                            <EffortDonut data={data['all']?.activityBreakdowns || []} title="Effort Distribution" />
-                                            <EffortDonut data={data['all']?.categoryBreakdowns || []} title="Effort Distribution" />
+                                            <EffortDonut data={data['all']?.activityBreakdowns || []} title="Project: Category Distribution" />
+                                            <EffortDonut data={data['all']?.categoryBreakdowns || []} title="Project: Activity Distribution" />
                                         </div>
                                         </>
                                         : <></>
@@ -266,6 +266,16 @@ const DashboardPage: React.FC = () => {
                                             selectedDev={selectedDev}    // Current dev string
                                             activeSection={activeSection} // 'feature', 'client', or 'all'
                                             sprintNames={allSprints}     // The array of sprint strings
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
+                                        <EffortDonut 
+                                            data={(data[currentSection.key]?.categoryBreakdowns || []).filter(i => i.developer === selectedDev)} 
+                                            title={`Category: ${selectedDev.split('<')[0]}`} 
+                                        />
+                                        <EffortDonut 
+                                            data={(data[currentSection.key]?.activityBreakdowns || []).filter(i => i.developer === selectedDev)} 
+                                            title={`Activity: ${selectedDev.split('<')[0]}`} 
                                         />
                                     </div>
                                 </>
