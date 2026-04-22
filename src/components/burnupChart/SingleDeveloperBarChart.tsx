@@ -43,10 +43,10 @@ const SingleDeveloperBarChart: React.FC<Props> = ({ stats, selectedDev, loading 
   let seriesData = [];
 
   if (isEffort) {
-      const typedStats = filtered as EffortVariance[];
+      const typedStats = stats as EffortVariance[];
       return {
         chart: { type: 'column', height: 450 },
-        title: { text: `Effort Variance: ${selectedDev}` },
+        title: { text: `Effort Variance` },
         xAxis: { categories, labels: { rotation: 0 } },
         yAxis: { min: 0, title: { text: 'Hours' } },
         // ENABLE dataLabels for Effort
