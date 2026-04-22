@@ -10,6 +10,7 @@ import SingleDeveloperBarChart from '../components/burnupChart/SingleDeveloperBa
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import LoadingOverlay from '../components/LoadingOverlay';
 import ActivityDistributionRow from '../components/burnupChart/ActivityDistributionRow';
+import EffortDonut from '../components/burnupChart/EffortDonut';
 
 const DashboardPage: React.FC = () => {
     const {
@@ -179,6 +180,10 @@ const DashboardPage: React.FC = () => {
                                                 variant="effort"
                                                 allSprints={allSprints} // Pass all sprints for effort variance calculation
                                             />
+                                            <div style={{ display: 'flex', gap: '20px', marginTop: '30px' }}>
+                                            <EffortDonut data={data['all']?.activityBreakdowns || []} title="Effort Distribution" />
+                                            <EffortDonut data={data['all']?.categoryBreakdowns || []} title="Effort Distribution" />
+                                        </div>
                                         </>
                                         : <></>
                                     }
