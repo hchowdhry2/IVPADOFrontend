@@ -268,13 +268,14 @@ const DashboardPage: React.FC = () => {
                                             sprintNames={allSprints}     // The array of sprint strings
                                         />
                                     </div>
+                                    
                                     <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
                                         <EffortDonut 
-                                            data={(data[currentSection.key]?.categoryBreakdowns || []).filter(i => i.developer === selectedDev)} 
+                                            data={(data['all']?.categoryBreakdowns || []).filter(i => i.developer === selectedDev)} 
                                             title={`Category: ${selectedDev.split('<')[0]}`} 
                                         />
                                         <EffortDonut 
-                                            data={(data[currentSection.key]?.activityBreakdowns || []).filter(i => i.developer === selectedDev)} 
+                                            data={(data['all']?.activityBreakdowns || []).filter(i => i.developer === selectedDev)} 
                                             title={`Activity: ${selectedDev.split('<')[0]}`} 
                                         />
                                     </div>

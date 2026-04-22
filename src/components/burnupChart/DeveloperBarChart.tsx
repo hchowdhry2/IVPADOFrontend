@@ -83,7 +83,7 @@ const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats, loading = 
             plotBands, 
             plotLines,
             seriesData: [
-                { name: 'Completed', data: completedData, color: '#22c55e' },
+                { name: 'Completed', data: completedData, color: '#54a371ff' },
                 { name: 'Pending', data: pendingData, color: '#e2e8f0' }
             ]
         };

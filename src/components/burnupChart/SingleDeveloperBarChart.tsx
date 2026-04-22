@@ -53,7 +53,7 @@ const SingleDeveloperBarChart: React.FC<Props> = ({ stats, selectedDev, loading 
         plotOptions: { column: { borderRadius: 4, dataLabels: { enabled: true } } },
         series: [
           { name: 'Committed', data: masterSprintList.map(s => typedStats.find(t => normalize(t.sprint) === normalize(s))?.committedEffort || 0), color: '#a5b4fc' },
-          { name: 'Actual', data: masterSprintList.map(s => typedStats.find(t => normalize(t.sprint) === normalize(s))?.actualEffort || 0), color: '#22c55e' }
+          { name: 'Actual', data: masterSprintList.map(s => typedStats.find(t => normalize(t.sprint) === normalize(s))?.actualEffort || 0), color: '#54a371ff' }
         ],
         credits: { enabled: false }
       };
@@ -79,7 +79,7 @@ const SingleDeveloperBarChart: React.FC<Props> = ({ stats, selectedDev, loading 
           { 
             name: 'Tasks Completed', 
             data: masterSprintList.map(s => aggStats.find(a => normalize(a.sprint) === normalize(s))?.totalTasksCompleted || 0), 
-            color: '#22c55e' 
+            color: '#54a371ff' 
           }
         ],
         credits: { enabled: false }

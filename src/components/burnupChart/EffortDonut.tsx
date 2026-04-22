@@ -4,9 +4,9 @@ import HighchartsReact from 'highcharts-react-official';
 
 interface EffortBreakdown {
   attribute?: string;
-  Attribute?: string; 
+  Attribute?: string;
   totalEffort?: number;
-  TotalEffort?: number; 
+  TotalEffort?: number;
 }
 
 interface Props {
@@ -16,9 +16,7 @@ interface Props {
 
 const EffortDonut: React.FC<Props> = ({ data, title }) => {
   const options = useMemo(() => {
-    // Aggregation logic with debug fallback
     const aggregatedData = (data || []).reduce((acc, curr) => {
-      // Handle both camelCase and PascalCase from C#
       const label = (curr.attribute || curr.Attribute || "Not Defined").trim();
       const value = curr.totalEffort || curr.TotalEffort || 0;
 
@@ -29,33 +27,84 @@ const EffortDonut: React.FC<Props> = ({ data, title }) => {
         acc.push({ name: label, y: value });
       }
       return acc;
-    }, [] as { name: string; y: number }[]);
+    }, [] as { name: string; y: number }[])
+    .sort((a, b) => b.y - a.y); // Sort descending to keep layout clean
+
+    const total = aggregatedData.reduce((sum, item) => sum + item.y, 0);
 
     return {
-      chart: { type: 'pie', height: 250, backgroundColor: 'transparent', margin: [0, 0, 0, 0] },
-      title: { text: title, style: { fontSize: '14px', fontWeight: '600', color: '#334155' } },
-      tooltip: { pointFormat: '<b>{point.name}</b>: {point.y:.1f} hrs' },
+      chart: { 
+        type: 'pie', 
+        height: 350, 
+        backgroundColor: 'transparent',
+      },
+      // Centering the title in the donut hole
+      title: { 
+        text: `<span style="font-size: 20px; color: #64748b; font-weight: 600;">${title}</span><br/>` +
+              `<span style="font-size: 18px; color: #1e293b; font-weight: 800;">${total.toFixed(1)}h</span>`,
+        align: 'center',
+        // verticalAlign: 'middle',
+        y: 10,
+        useHTML: true
+      },
+      tooltip: { 
+        headerFormat: '',
+        pointFormat: '<span style="color:{point.color}">●</span> <b>{point.name}</b>: {point.y:.1f} hrs ({point.percentage:.1f}%)' 
+      },
+      // give subtle colors:       colors: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#94a3b8'],
+// colors: [
+//   '#94a3b8', // Muted Blue-Gray (Slate 400)
+//   '#a5b4fc', // Soft Indigo
+//   '#cbd5e1', // Light Steel Blue
+//   '#c4b5fd', // Muted Lavender
+//   '#64748b', // Deep Slate Blue
+//   '#e2e8f0'  // Neutral Background Gray
+// ],      
+colors: [
+  '#60a5fa', // Muted Sky Blue (Desaturated)
+  '#818cf8', // Muted Periwinkle
+  '#9ca3af', // Medium Gray
+  '#a78bfa', // Dusty Purple
+  '#475569', // Dark Slate
+  '#f1f5f9'  // Ghost White
+],
       plotOptions: {
         pie: {
-          innerSize: '65%',
-          dataLabels: { enabled: true, format: '{point.name}', style: { fontSize: '10px' } }
+          innerSize: '60%',
+          borderWidth: 3,
+          borderColor: '#ffffff',
+          dataLabels: { 
+            enabled: true,
+            useHTML: true,
+            allowOverlap: true, // Forces display even if labels are close
+            padding: 0,        // Removes extra space around labels to fit more
+            distance: 30,      // Pushes labels further out to give them room to breathe
+            crop: false,       // Prevents labels from being cut off at chart edges
+            overflow: 'none',
+            format: '<b>{point.name}</b><br/>{point.y:.1f}h', 
+            connectorWidth: 1,
+            style: { fontSize: '13px', color: '#475569', textOutline: 'none' }
+          }
         }
       },
-      series: [{ name: 'Effort', colorByPoint: true, data: aggregatedData }],
+      series: [{ name: 'Effort', data: aggregatedData }],
       credits: { enabled: false }
     };
   }, [data, title]);
 
-  // DIAGNOSTIC: If data exists but chart is empty, log this
-  if (data && data.length > 0 && !options.series[0].data.length) {
-     console.warn("EffortDonut: Data found but aggregation resulted in empty list. Check property names:", data[0]);
-  }
-
   if (!data || data.length === 0) {
-    return <div style={{ height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>No Data Available</div>;
+    return (
+      <div style={{ flex: 1, height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', border: '1px dashed #e2e8f0', borderRadius: '12px' }}>
+        No Data Available
+      </div>
+    );
   }
 
-  return <HighchartsReact highcharts={Highcharts} options={options} />;
+  return (
+    <div style={{ flex: 1, background: '#fff', padding: '15px', borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+      <HighchartsReact highcharts={Highcharts} options={options} />
+    </div>
+  );
 };
 
 export default EffortDonut;
