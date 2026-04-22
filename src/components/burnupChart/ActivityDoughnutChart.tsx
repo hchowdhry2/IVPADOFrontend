@@ -57,7 +57,9 @@ const ActivityDoughnutChart: React.FC<Props> = ({ activities }) => {
   // Handle empty state (if activities are empty, show a grey placeholder)
   if (!activities || activities.length === 0) {
       return (
-          <div style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+          <div style={{ height: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8',
+            
+           }}>
               No Data
           </div>
       );

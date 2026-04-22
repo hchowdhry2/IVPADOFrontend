@@ -61,7 +61,7 @@ const ActivityDistributionRow: React.FC<Props> = ({ data, selectedDev, activeSec
                 </div>
             </div>
             );
-        }).reverse() /* Show most recent sprint first */}
+        })}
         
       </div>
     </div>

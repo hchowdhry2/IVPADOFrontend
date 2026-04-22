@@ -49,6 +49,8 @@ const DashboardPage: React.FC = () => {
         }
     }, [developers, selectedDev]);
 
+    console.log("All Sprints for Developer View:", data);
+
     return (
         <div className="dashboard-container">
             <LoadingOverlay isLoading={loading && !data} message="Fetching data..." />
@@ -236,6 +238,13 @@ const DashboardPage: React.FC = () => {
                                             variant="tasks"
                                             allSprints={allSprints} // Pass all sprints
                                         />
+                                        {/* <SingleDeveloperBarChart 
+                                            loading={loading}
+                                            stats={data[currentSection?.key || 'all']?.effortVariance || []} 
+                                            selectedDev={selectedDev} // Pass state as prop
+                                            variant="effort"
+                                            allSprints={allSprints} // Pass all sprints for effort variance calculation
+                                        /> */}
                                     </div>
 
                                     {/* <div style={{ marginBottom: '30px' }}>
