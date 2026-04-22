@@ -14,7 +14,7 @@ interface Props {
 
 const ActivityDoughnutChart: React.FC<Props> = ({ activities }) => {
   const chartOptions = useMemo(() => ({
-    chart: { type: 'pie', height: 250, backgroundColor: 'transparent', },
+    chart: { type: 'pie', height: 220, backgroundColor: 'transparent' },
     title: { text: null },
     tooltip: { 
       pointFormat: '<b>{point.name}</b>: {point.completed} out of {point.y} completed' 
@@ -25,7 +25,7 @@ const ActivityDoughnutChart: React.FC<Props> = ({ activities }) => {
         // 1. Enable and configure Data Labels
         dataLabels: { 
           enabled: true,
-          format: '<b>{point.name} ({point.completed}/{point.y} completed)</b>', // Shows the activityType
+          format: '<b>{point.name}({point.completed}/{point.y} completed)</b>', // Shows the activityType
           distance: 15, // Distance from the slice
           style: {
             fontSize: '10px',
@@ -57,9 +57,7 @@ const ActivityDoughnutChart: React.FC<Props> = ({ activities }) => {
   // Handle empty state (if activities are empty, show a grey placeholder)
   if (!activities || activities.length === 0) {
       return (
-          <div style={{ height: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8',
-            
-           }}>
+          <div style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
               No Data
           </div>
       );
