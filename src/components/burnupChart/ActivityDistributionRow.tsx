@@ -14,7 +14,7 @@ const ActivityDistributionRow: React.FC<Props> = ({ data, selectedDev, activeSec
   if (!sprintNames || sprintNames.length === 0) return null;
 
   return (
-    <div className="dashboard-section modern-theme" style={{ marginTop: '30px' }}>
+    <div className="dashboard-section" style={{ marginTop: '30px' }}>
       <h3 style={{ paddingLeft: '10px' }}>Activity Breakdown: {selectedDev.split('<')[0]}</h3>
       
       <div style={{ 

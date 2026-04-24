@@ -152,7 +152,7 @@ const DashboardPage: React.FC = () => {
 
                             {/* Move the Section Tabs (Feature, Spillage, etc.) here */}
                             <div className="tab-container" style={{ marginTop: '20px', display: 'flex', gap: '10px'}}>
-                                {sections.filter(section => section.key !== 'all').map(section => (
+                                {sections.map(section => (
                                     <button 
                                         key={section.key}
                                         style={{ backgroundColor: activeSection === section.key ? '#a5b4fc' : '', border: activeSection === section.key ? '2px solid #6366f1' : '' }}
@@ -181,18 +181,18 @@ const DashboardPage: React.FC = () => {
                                                 allSprints={allSprints} // Pass all sprints for effort variance calculation
                                             />
                                             <div style={{ display: 'flex', gap: '20px', marginTop: '30px' }}>
-                                            <EffortDonut data={data['all']?.activityBreakdowns || []} title="Project: Category Distribution" />
-                                            <EffortDonut data={data['all']?.categoryBreakdowns || []} title="Project: Activity Distribution" />
+                                            <EffortDonut data={data['all']?.activityBreakdowns || []} title="Project: Activity Distribution" />
+                                            <EffortDonut data={data['all']?.categoryBreakdowns || []} title="Project: Category Distribution" />
                                         </div>
                                         </>
                                         : <></>
                                     }
 
                                     <div style={{ marginBottom: '30px' }}>
-                                        <ImpactedFeaturesCard 
+                                        {workType === 'story' ? <ImpactedFeaturesCard 
                                             loading={loading}
                                             features={(data[currentSection.key] as any)?.history || []} 
-                                        />
+                                        /> : <></>}
                                     </div>
                                 </div>
                             )}
