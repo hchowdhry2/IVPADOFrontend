@@ -18,6 +18,7 @@ const SingleDeveloperBarChart: React.FC<Props> = ({ stats, selectedDev, loading 
     return <LoadingSkeleton type="chart" height="450px" />;
   }
 
+  console.log('Rendering SingleDeveloperBarChart with stats:', stats);
   const chartOptions = useMemo(() => {
   const isEffort = variant === 'effort';
   const filtered = stats.filter(s => s.developer === selectedDev);
@@ -47,13 +48,13 @@ const SingleDeveloperBarChart: React.FC<Props> = ({ stats, selectedDev, loading 
       return {
         chart: { type: 'column', height: 450 },
         title: { text: `Effort Variance` },
-        xAxis: { categories, labels: { rotation: 0 } },
+        xAxis: { categories : stats.map(s => s.developer), labels: { rotation: 0 } },
         yAxis: { min: 0, title: { text: 'Hours' } },
         // ENABLE dataLabels for Effort
         plotOptions: { column: { borderRadius: 4, dataLabels: { enabled: true } } },
         series: [
-          { name: 'Committed', data: masterSprintList.map(s => typedStats.find(t => normalize(t.sprint) === normalize(s))?.committedEffort || 0), color: '#a5b4fc' },
-          { name: 'Actual', data: masterSprintList.map(s => typedStats.find(t => normalize(t.sprint) === normalize(s))?.actualEffort || 0), color: '#54a371ff' }
+        //   { name: 'Committed', data: stats.map(s => (s as EffortVariance).committedEffort || 0), color: '#a5b4fc' },
+          { name: 'Dev Effort', data: stats.map(s => (s as EffortVariance).actualEffort || 0), color: '#54a371ff' }
         ],
         credits: { enabled: false }
       };

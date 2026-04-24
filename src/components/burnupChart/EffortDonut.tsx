@@ -94,7 +94,7 @@ colors: [
 
   if (!data || data.length === 0) {
     return (
-      <div style={{ flex: 1, height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', border: '1px dashed #e2e8f0', borderRadius: '12px' }}>
+      <div style={{ flex: 1, height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', border: '1px dashed #e2e8f0', borderRadius: '12px', marginBottom: '20px' }}>
         No Data Available
       </div>
     );
