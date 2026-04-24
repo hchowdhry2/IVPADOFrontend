@@ -16,9 +16,81 @@ const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats, loading = 
         return <LoadingSkeleton type="chart" height="500px" />;
     }
 
+    // const { categories, seriesData, plotBands, plotLines } = useMemo(() => {
+    //     // 1. Get unique sprints sorted
+    //     // const sprints = Array.from(new Set(stats.map(s => s.sprint))).sort();
+    //     const sprints: string[] = [];
+    //     stats.forEach(s => {
+    //         if (!sprints.includes(s.sprint)) {
+    //             sprints.push(s.sprint);
+    //         }
+    //     });
+    //     sprints.reverse();
+
+    //     // 2. Get unique developers in a consistent order (Alphabetical)
+    //     const masterDevList = Array.from(new Set(stats.map(s => s.developer))).sort();
+        
+    //     const categories: string[] = [];
+    //     const plotBands: Highcharts.XAxisPlotBandsOptions[] = [];
+    //     const plotLines: Highcharts.XAxisPlotLinesOptions[] = [];
+    //     const completedData: number[] = [];
+    //     const pendingData: number[] = [];
+        
+    //     let currentPos = 0;
+
+    //     sprints.forEach((sprint, idx) => {
+    //         const startPos = currentPos;
+
+    //         // Use the masterDevList to ensure the order is identical in every sprint bucket
+    //         masterDevList.forEach(devName => {
+    //             const devStat = stats.find(s => s.sprint === sprint && s.developer === devName);
+                
+    //             categories.push(devName);
+    //             // If dev didn't work in this specific sprint, push 0
+    //             completedData.push(devStat ? devStat.totalTasksCompleted : 0);
+    //             pendingData.push(devStat ? Math.max(0, devStat.totalTasksAssigned - devStat.totalTasksCompleted) : 0);
+                
+    //             currentPos++;
+    //         });
+
+    //         // 3. Shaded backgrounds for sprints
+    //         plotBands.push({
+    //             from: startPos - 0.5,
+    //             to: currentPos - 0.5,
+    //             color: idx % 2 === 0 ? 'transparent' : 'rgba(248, 250, 252, 0.5)',
+    //             label: {
+    //                 text: sprint.split('\\').pop() || sprint,
+    //                 align: 'center',
+    //                 verticalAlign: 'top',
+    //                 y: -40, // Adjusted for extra margin
+    //                 style: { color: '#64748b', fontWeight: 'bold' }
+    //             }
+    //         });
+
+    //         // 4. Vertical divider lines between sprints
+    //         if (idx < sprints.length - 1) {
+    //             plotLines.push({
+    //                 value: currentPos - 0.5,
+    //                 color: '#e2e8f0', // Light grey line
+    //                 width: 2,
+    //                 zIndex: 3
+    //             });
+    //         }
+    //     });
+
+    //     return { 
+    //         categories, 
+    //         plotBands, 
+    //         plotLines,
+    //         seriesData: [
+    //             { name: 'Completed', data: completedData, color: '#54a371ff' },
+    //             { name: 'Pending', data: pendingData, color: '#e2e8f0' }
+    //         ]
+    //     };
+    // }, [stats]);
+
     const { categories, seriesData, plotBands, plotLines } = useMemo(() => {
-        // 1. Get unique sprints sorted
-        // const sprints = Array.from(new Set(stats.map(s => s.sprint))).sort();
+        // 1. Get unique sprints sorted chronologically
         const sprints: string[] = [];
         stats.forEach(s => {
             if (!sprints.includes(s.sprint)) {
@@ -27,9 +99,6 @@ const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats, loading = 
         });
         sprints.reverse();
 
-        // 2. Get unique developers in a consistent order (Alphabetical)
-        const masterDevList = Array.from(new Set(stats.map(s => s.developer))).sort();
-        
         const categories: string[] = [];
         const plotBands: Highcharts.XAxisPlotBandsOptions[] = [];
         const plotLines: Highcharts.XAxisPlotLinesOptions[] = [];
@@ -40,41 +109,49 @@ const DeveloperBarChart: React.FC<DeveloperBarChartProps> = ({ stats, loading = 
 
         sprints.forEach((sprint, idx) => {
             const startPos = currentPos;
+            let sprintHasWork = false;
 
-            // Use the masterDevList to ensure the order is identical in every sprint bucket
-            masterDevList.forEach(devName => {
-                const devStat = stats.find(s => s.sprint === sprint && s.developer === devName);
-                
-                categories.push(devName);
-                // If dev didn't work in this specific sprint, push 0
-                completedData.push(devStat ? devStat.totalTasksCompleted : 0);
-                pendingData.push(devStat ? Math.max(0, devStat.totalTasksAssigned - devStat.totalTasksCompleted) : 0);
-                
-                currentPos++;
-            });
+            // 2. Filter stats for this sprint AND sort them alphabetically by developer
+            const sprintStats = stats
+                .filter(s => s.sprint === sprint)
+                .sort((a, b) => a.developer.localeCompare(b.developer));
 
-            // 3. Shaded backgrounds for sprints
-            plotBands.push({
-                from: startPos - 0.5,
-                to: currentPos - 0.5,
-                color: idx % 2 === 0 ? 'transparent' : 'rgba(248, 250, 252, 0.5)',
-                label: {
-                    text: sprint.split('\\').pop() || sprint,
-                    align: 'center',
-                    verticalAlign: 'top',
-                    y: -40, // Adjusted for extra margin
-                    style: { color: '#64748b', fontWeight: 'bold' }
+            sprintStats.forEach(devStat => {
+                // Only push to chart if assigned tasks > 0
+                if (devStat.totalTasksAssigned > 0) {
+                    categories.push(devStat.developer);
+                    completedData.push(devStat.totalTasksCompleted);
+                    pendingData.push(Math.max(0, devStat.totalTasksAssigned - devStat.totalTasksCompleted));
+                    
+                    currentPos++;
+                    sprintHasWork = true;
                 }
             });
 
-            // 4. Vertical divider lines between sprints
-            if (idx < sprints.length - 1) {
-                plotLines.push({
-                    value: currentPos - 0.5,
-                    color: '#e2e8f0', // Light grey line
-                    width: 2,
-                    zIndex: 3
+            // 3. Shaded backgrounds for sprints (only if developers were added)
+            if (sprintHasWork) {
+                plotBands.push({
+                    from: startPos - 0.5,
+                    to: currentPos - 0.5,
+                    color: idx % 2 === 0 ? 'transparent' : 'rgba(248, 250, 252, 0.5)',
+                    label: {
+                        text: sprint.split('\\').pop() || sprint,
+                        align: 'center',
+                        verticalAlign: 'top',
+                        y: -40,
+                        style: { color: '#64748b', fontWeight: 'bold' }
+                    }
                 });
+
+                // 4. Vertical divider lines
+                if (idx < sprints.length - 1) {
+                    plotLines.push({
+                        value: currentPos - 0.5,
+                        color: '#e2e8f0',
+                        width: 2,
+                        zIndex: 3
+                    });
+                }
             }
         });
 
