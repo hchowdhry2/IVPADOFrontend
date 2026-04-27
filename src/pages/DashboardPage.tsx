@@ -30,6 +30,8 @@ const DashboardPage: React.FC = () => {
     const currentSection = sections.find(s => s.key === activeSection);
     const [selectedDev, setSelectedDev] = useState<string>('');
 
+    const isFinancialMode = timeFrame?.includes('financial') ?? false;
+
     const developers = useMemo(() => {
         if (!data?.all?.developerStats) return [];
         return Array.from(new Set(data.all.developerStats.map(s => s.developer))).sort();
@@ -104,6 +106,8 @@ const DashboardPage: React.FC = () => {
                             className="sprint-input"
                             value={lastN} 
                             min="1"
+                            disabled={isFinancialMode} // Disable when financial mode is active
+                            style={{ opacity: isFinancialMode ? 0.5 : 1 }}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastN(parseInt(e.target.value) || 0)}
                         />
                     </div>
@@ -115,6 +119,8 @@ const DashboardPage: React.FC = () => {
                         >
                             <option value="null">sprint-wise</option>
                             <option value="quarterly">quarterly</option>
+                            <option value="financial_current">Current Financial Year</option>
+                            <option value="financial_previous">Previous Financial Year</option>
                         </select>
                     </div>
                 </div>
